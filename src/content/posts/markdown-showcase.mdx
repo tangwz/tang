@@ -1,0 +1,250 @@
+---
+title: "A field guide to Markdown"
+description: "Headings, tables, code, math, callouts, footnotes, and images. A live specimen of the writing tools in this theme."
+pubDatetime: 2026-10-05T08:00:00Z
+lang: en
+sample: true
+tags: ["Theme guide", writing]
+coverColor: blue
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+import { getAssetPath } from "@/utils/withBase";
+
+Good writing deserves a comfortable place to live. This sample gathers the elements you can use in an article or a video transcript, so you can see how they look together in **light and dark mode**.
+
+Treat this page as a working specimen: follow the section links in the table of contents, copy a code block, or open the image. For the settings behind the page, read the [theme configuration guide](/posts/theme-configuration/).
+
+## Text and links
+
+A normal paragraph sets the rhythm. Use **bold text** to emphasize an idea, _italics_ for a gentle change in tone, and ~~strikethrough~~ for a visible correction. An inline command such as `pnpm dev` stays close to the sentence it belongs to.
+
+Links can point to [another article](/posts/build-small-stay-curious/), a [section on this page](#tables), or an [external reference](https://astro-paper.pages.dev/posts/astro-paper-v6/). This is an original demonstration for the creator theme, inspired by the structure of AstroPaper’s release notes.
+
+You can also add a footnote without interrupting the paragraph.[^specimen] A forced line break is useful for a short verse:
+
+Start with a question.  
+Make something small.  
+Leave room for curiosity.
+
+## Heading hierarchy
+
+The article title is the page’s H1. Start the body with H2 sections; these appear in the automatic table of contents. The smaller headings below show the rest of the hierarchy.
+
+### A third-level heading
+
+Use this for a subsection within a larger idea.
+
+#### A fourth-level heading
+
+Use this when a subsection needs a little more structure.
+
+##### A fifth-level heading
+
+A smaller heading still belongs to the same family of type.
+
+###### A sixth-level heading
+
+Keep deep nesting rare: the reader should be able to follow the argument without a map.
+
+## Lists and tasks
+
+An unordered list works well for a few related ideas:
+
+- Protect a small block of focused time.
+- Keep a notebook within reach.
+  - Capture a question before finding an answer.
+  - Save the useful parts of a failed experiment.
+- Share something you learned.
+
+Use a numbered list when the order matters:
+
+1. Find one problem worth solving.
+2. Make the smallest useful version.
+   1. Explain what it does.
+   2. Ask someone to try it.
+3. Improve it from what you observe.
+
+Task lists show progress. These are static Markdown checkboxes, rather than a saved interactive checklist:
+
+- [x] Write a first draft.
+- [x] Add an example.
+- [ ] Replace the sample with your own story.
+
+## Quotes and callouts
+
+> A useful creative practice is one you can return to. Choose a pace that leaves you enough attention to notice what you are learning.
+>
+> — A note from this sample article
+
+Callouts give supporting information its own space:
+
+> [!NOTE]
+> Articles and video transcripts use the same reading layout. Second-level headings become navigation links automatically.
+
+> [!TIP]
+> Keep related images and explanations close together. Readers should not have to hunt for the context.
+
+> [!WARNING]
+> These are demonstration pages. Replace sample titles, descriptions, and images before treating them as your published work.
+
+## Code blocks
+
+Code blocks support syntax highlighting, a filename label, and a copy button. Long lines scroll inside the block.
+
+```ts file="src/lib/greeting.ts"
+type Reader = {
+  name: string;
+  language: "en" | "zh";
+};
+
+export function greet(reader: Reader): string {
+  return `Hello, ${reader.name}. Make something worth sharing.`;
+}
+```
+
+Line highlights and inline word highlights can draw attention to a change:
+
+```ts file="src/lib/publishing.ts"
+// [!code word:published]
+const published = true; // [!code highlight]
+const title = "Make room for good work";
+
+if (published) {
+  console.log(title);
+}
+```
+
+Diff annotations help explain a before-and-after example:
+
+```ts file="src/lib/preferences.ts"
+const preference = "light"; // [!code --]
+const preference = "system"; // [!code ++]
+```
+
+Here is a shell example with an intentionally long line:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+curl --header "Accept: application/json" https://example.com/api/articles?language=en\&category=building\&include=description,publishedAt,readingTime
+```
+
+## Tables
+
+Tables are useful for comparisons. This table has left, center, and right alignment. On a narrow screen, it scrolls horizontally inside its own frame.
+
+<ResponsiveTable variant="striped-minimal">
+
+| Format               |     Source      | Reading time |
+| :------------------- | :-------------: | -----------: |
+| Essay                |    Markdown     |        6 min |
+| Video and transcript | MDX + Bilibili  |       12 min |
+| Reading note         | Book collection |        4 min |
+| Newsletter archive   |  Public letter  |        3 min |
+
+</ResponsiveTable>
+
+## Math
+
+Use the same LaTeX delimiters as Obsidian: `$...$` for an inline formula, and `$$...$$` on separate lines for a display formula. Articles, MDX pages, and video transcripts share this support. MathJax renders the formulas during the build, with no browser script or external font request.
+
+Inline formulas fit into a sentence: $E = mc^2$, $e^{i\pi} + 1 = 0$, and $\alpha \in \mathbb{R}$. Literal inequality signs work too: $x > 0$.
+
+```md
+Inline: $E = mc^2$.
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+```
+
+The quadratic formula uses a fraction, a square root, and a plus-or-minus sign:
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+
+Use `aligned` to keep related equations together:
+
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+\int_0^1 x^2\,dx &= \left[\frac{x^3}{3}\right]_0^1 = \frac{1}{3}
+\end{aligned}
+$$
+
+Matrices use `&` between columns and `\\` between rows:
+
+$$
+A = \begin{pmatrix} a & b \\ c & d \end{pmatrix},
+\qquad \det(A) = ad - bc
+$$
+
+Piecewise definitions use the `cases` environment:
+
+$$
+|x| = \begin{cases} x, & x \geq 0 \\ -x, & x < 0 \end{cases}
+$$
+
+Long inline formulas also scroll inside their own frame on a phone: $\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log p_{\theta}(x_i) + (1-y_i)\log\left(1-p_{\theta}(x_i)\right)\right] + \lambda\sum_{j=1}^{d}\theta_j^2$.
+
+Long display formulas have the same behavior. Focus a formula and use the arrow keys to scroll:
+
+$$
+\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log p_{\theta}(x_i) + (1-y_i)\log\left(1-p_{\theta}(x_i)\right)\right] + \lambda\sum_{j=1}^{d}\theta_j^2
+$$
+
+A display inequality can use the greater-than sign directly:
+
+$$
+x > 0
+$$
+
+Code examples keep their literal dollar signs. For a price in normal text, escape the symbol as `\$20` to display \$20. These examples use standard LaTeX commands; Obsidian plugins and custom macros are not imported automatically.
+
+## Images and captions
+
+An image can break up a long explanation. Click or focus this image and press Enter to open the preview; Escape closes it.
+
+<figure>
+  <img
+    src={getAssetPath("images/writing.jpg")}
+    alt="A notebook with handwritten ideas on a writing desk"
+    width="1200"
+    height="800"
+    loading="lazy"
+  />
+  <figcaption>
+    A small space for ideas before they become articles. A sample image from the
+    theme.
+  </figcaption>
+</figure>
+
+## Dividers and small details
+
+A horizontal rule creates a pause between two parts of a story.
+
+---
+
+HTML can add a little extra meaning: save a shortcut as <kbd>⌘</kbd> + <kbd>K</kbd>, mark a phrase with <mark>room to think</mark>, or write H<sub>2</sub>O and x<sup>2</sup>.
+
+<details>
+  <summary>What is the difference between Markdown and MDX?</summary>
+  <p>
+    Markdown covers everyday writing: headings, links, images, lists, and code.
+    MDX adds component imports, such as the responsive table used on this page.
+  </p>
+  <p>
+    Use a .md file for a regular article and a .mdx file when you need a
+    component. Both live in the same content collection.
+  </p>
+</details>
+
+Mermaid diagrams still need an additional rendering plugin. A `mermaid` code block currently displays source code.
+
+## Put it into practice
+
+Use the elements that help your reader, then let the writing lead. You can open the [configuration guide](/posts/theme-configuration/) to change the author, colors, fonts, or content, or return to [all articles](/works/?type=article).
+
+[^specimen]: This sample is also a quick way to check text contrast, line spacing, links, and code styling after changing the theme.

@@ -1,0 +1,11 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import PreviewRedirect from "@/components/PreviewRedirect.astro";
+import config from "@/config";
+const destination = getRelativeLocaleUrl(
+  Astro.currentLocale ?? config.site.lang,
+  "works/"
+);
+---
+
+<PreviewRedirect {destination} />

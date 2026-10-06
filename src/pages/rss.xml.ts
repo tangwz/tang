@@ -1,22 +1,26 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
-import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getCreatorPosts } from "@/utils/getCreatorPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
+import { getLocalizedPosts } from "@/utils/getLocalizedContent";
+import { translate } from "@/i18n/creator";
 import config from "@/config";
 
-export async function GET() {
-  const posts = await getCollection("posts");
-  const sortedPosts = getSortedPosts(posts);
+export async function createRss(locale: string) {
+  const posts = await getLocalizedPosts(locale);
+  const sortedPosts = getCreatorPosts(posts);
 
   return rss({
-    title: config.site.title,
-    description: config.site.description,
+    title: translate(locale, config.site.title),
+    description: translate(locale, config.site.description),
     site: config.site.url,
+    customData: `<language>${locale === "zh" ? "zh-CN" : "en"}</language>`,
     items: sortedPosts.map(({ data, id, filePath }) => ({
-      link: getPostUrl(id, filePath, config.site.lang),
+      link: getPostUrl(id, filePath, locale),
       title: data.title,
       description: data.description,
       pubDate: new Date(data.modDatetime ?? data.pubDatetime),
     })),
   });
 }
+
+export const GET = () => createRss("en");

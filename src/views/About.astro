@@ -1,0 +1,98 @@
+---
+import { useCreatorTranslations } from "@/i18n/creator";
+const tr = useCreatorTranslations(Astro.currentLocale);
+import { getRelativeLocaleUrl } from "astro:i18n";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Newsletter from "@/components/Newsletter.astro";
+import CreatorIcon from "@/components/CreatorIcon.astro";
+import { creator } from "@/data/creator";
+import config from "@/config";
+const href = (path: string) =>
+  getRelativeLocaleUrl(Astro.currentLocale ?? config.site.lang, path);
+---
+
+<Layout
+  title={`${tr("About")} ${creator.name} | ${tr(config.site.title)}`}
+  description={tr(
+    "Writer, video creator, and developer. A little about the person behind this corner of the internet."
+  )}
+>
+  <Header /><main id="main-content" data-pagefind-body class="wide-container">
+    <div class="page-header">
+      <span class="eyebrow">{tr("THE PERSON BEHIND THE PIXELS")}</span><h1>
+        {tr("Hey, I'm ")}
+        <em>{creator.name}.</em>
+      </h1><p>
+        {
+          tr(
+            "A writer, video creator, and programmer. Three ways of looking at the world, and one ongoing practice of making things that matter."
+          )
+        }
+      </p>
+    </div><section class="about-grid">
+      <img
+        src={creator.images.desk}
+        width="650"
+        height="600"
+        alt={tr(
+          "A creative workspace with a notebook, a laptop, and a cup of coffee"
+        )}
+      /><div>
+        <span class="eyebrow">{tr("A LITTLE ABOUT ME")}</span><h2>
+          {tr("Somewhere between")}<br />{tr("words, stories,")}
+          <em>{tr("& code.")}</em>
+        </h2><p>
+          {
+            tr(
+              "I like turning a complicated idea into something clear: an essay you can sit with, a story you can watch, or a tool you can use."
+            )
+          }
+        </p><p>
+          {
+            tr(
+              "My background is in infrastructure and backend development. Writing and video give me other ways to explore questions, share what I learn, and connect with people outside the code."
+            )
+          }
+        </p><p>
+          {
+            tr(
+              "This site brings those threads together. A place to publish thoughts, collect good ideas, and build towards books, courses, and an independent creative practice."
+            )
+          }
+        </p><a class="text-link" href={href("works/")}
+          >{tr("Explore the things I'm thinking about")}
+          <CreatorIcon name="arrow" size={18} /></a
+        >
+      </div>
+    </section><section class="pathways">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">{tr("A FEW THINGS I COME BACK TO")}</span><h2>
+            {tr("Slow is")}
+            <em>{tr("fast.")}</em>
+          </h2>
+        </div>
+      </div><div class="pathway-grid">
+        <div class="pathway-card">
+          <div class="pathway-top"><CreatorIcon name="pen" /></div><h2>
+            {tr("Think clearly.")}
+          </h2><p>{tr("Good questions before quick answers.")}</p>
+        </div><div class="pathway-card">
+          <div class="pathway-top"><CreatorIcon name="code" /></div><h2>
+            {tr("Build carefully.")}
+          </h2><p>{tr("Useful things that stand the test of time.")}</p>
+        </div><div class="pathway-card">
+          <div class="pathway-top"><CreatorIcon name="play" /></div><h2>
+            {tr("Share openly.")}
+          </h2><p>{tr("Stories from the process, as it unfolds.")}</p>
+        </div><div class="pathway-card">
+          <div class="pathway-top"><CreatorIcon name="spark" /></div><h2>
+            {tr("Stay curious.")}
+          </h2><p>{tr("There's always another way to see it.")}</p>
+        </div>
+      </div>
+    </section><div class="newsletter-section"><Newsletter /></div>
+  </main><Footer />
+</Layout>

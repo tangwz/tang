@@ -1,0 +1,223 @@
+---
+title: "主题配置指南"
+description: "从个人资料、文章与 Bilibili 视频，到 Newsletter、中英文、字体与深浅色模式，了解这个 Astro 主题的配置入口。"
+pubDatetime: 2026-10-04T08:00:00Z
+lang: zh
+sample: true
+tags: ["Theme guide", building]
+coverColor: purple
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+这个网站围绕程序员、文字创作者与视频创作者的身份设计：主页介绍你是谁，**我的作品**把博客、视频、读书笔记与 Newsletter 汇聚到同一个卡片列表。
+
+本指南说明当前仓库的实际配置，组织方式参考 AstroPaper 的[主题配置文档](https://astro-paper.pages.dev/posts/how-to-configure-astropaper-theme/)。想先看正文排版，可以打开 [Markdown 示例](/zh/posts/markdown-showcase/)。
+
+## 先找到对应的文件
+
+<ResponsiveTable variant="striped-minimal">
+
+| 想修改什么                                | 修改位置                                        |
+| :---------------------------------------- | :---------------------------------------------- |
+| 站点标题、作者、域名、时区                | `astro-paper.config.ts`                         |
+| 个人照片、书架、课程提纲、Newsletter 名称 | `src/data/creator.ts`                           |
+| 公开的 Newsletter 来信                    | `src/data/letters.ts`                           |
+| 博客文章与译文                            | `src/content/posts/`                            |
+| Bilibili 视频与文字稿                     | `src/content/videos/`                           |
+| 首页介绍与个人故事                        | `src/views/Home.astro`、`src/views/About.astro` |
+| 中文界面文案                              | `src/i18n/messages/zh.json`                     |
+| 颜色、字体、页面间距                      | `src/styles/`                                   |
+
+</ResponsiveTable>
+
+## 姓名与站点信息
+
+修改 `astro-paper.config.ts` 中的 `site`。`author` 是导航标志、页脚、个人介绍与文章默认作者共用的姓名；`title` 和 `description` 用于页面元信息，需要与自己的身份保持一致。
+
+```ts file="astro-paper.config.ts"
+site: {
+  url: "https://example.com/",
+  title: "Terence Tang — Writer, Creator & Developer",
+  description: "Essays, videos, and ideas on technology and creativity.",
+  author: "Terence Tang",
+  ogImage: "og.png",
+  lang: "en",
+  timezone: "Asia/Shanghai",
+  dir: "ltr",
+},
+```
+
+正式上线前，将 `url` 换成真实域名。canonical、站点地图与 RSS 都会使用这个地址。首页本身的描述写在 `Home.astro` 中，修改时也要更新中文翻译键。
+
+首页精选数量由 `posts.perIndex` 控制，默认六张；作品库与文章列表统一使用 `posts.perPage`，默认每页九项。页脚社交链接读取 `socials`，文章分享按钮读取 `shareLinks`；空数组会隐藏对应入口。
+
+## 照片与个人介绍
+
+把自己的照片放到 `public/images/`，再修改 `creator.images.portrait`。当前空值会使用工作台照片作为占位。
+
+```ts file="src/data/creator.ts"
+images: {
+  portrait: getAssetPath("images/portrait.jpg"),
+  desk: getAssetPath("images/creative-desk.jpg"),
+  writing: getAssetPath("images/writing.jpg"),
+  landscape: getAssetPath("images/landscape.jpg"),
+},
+```
+
+`getAssetPath` 会处理站点 base path。首页介绍位于 `src/views/Home.astro`，完整个人故事位于 `src/views/About.astro`。英文文案也是中文翻译表的键，因此修改英文后，需要同步修改 `src/i18n/messages/zh.json`。
+
+## 新增一篇文章
+
+在 `src/content/posts/` 创建 Markdown 或 MDX 文件。使用简短、稳定的文件名：`my-first-essay.md` 对应 `/posts/my-first-essay/`。
+
+```yaml file="src/content/posts/my-first-essay.md"
+---
+title: "Make space for your next idea"
+description: "A small practice for turning curiosity into useful work."
+pubDatetime: 2026-10-01T08:00:00Z
+lang: en
+tags: [creativity, building]
+coverColor: blue
+draft: false
+sample: false
+---
+```
+
+在第二条 `---` 之后写正文，二级标题会自动生成目录。
+
+<ResponsiveTable variant="striped-minimal">
+
+| 字段                                  | 实际行为                                                                 |
+| :------------------------------------ | :----------------------------------------------------------------------- |
+| `title`、`description`、`pubDatetime` | 必填的文章信息                                                           |
+| `lang`                                | `en` 或 `zh`，默认英文                                                   |
+| `author`                              | 可选，覆盖 `site.author`                                                 |
+| `tags`                                | 话题标签，默认 `others`                                                  |
+| `coverColor`                          | `blue`、`coral`、`yellow`、`purple`                                      |
+| `coverImage`                          | 可选，使用图片替代标题封面                                               |
+| `draft: true`                         | 不生成公开文章路由，也不进入列表                                         |
+| `sample: true`                        | 标记为示例，仍然进入作品库                                               |
+| `template: true`                      | 旧主题文档，设置 `noindex`，不进入作品、归档、标签、搜索、RSS 和 sitemap |
+| `modDatetime`                         | 可选的更新日期                                                           |
+
+</ResponsiveTable>
+
+文章和视频的生产构建会根据发布时间和 `posts.scheduledPostMargin` 判断文章是否公开。本地开发会显示非草稿的未来文章，方便预览。静态网站不会自行定时发布，需要在计划发布时间重新构建。
+
+## 编写数学公式
+
+Markdown 文章、MDX 页面和视频文字稿支持 Obsidian 风格的 LaTeX 公式。行内使用 `$...$`，块级公式在前后各放一行 `$$`：
+
+```md
+Energy is $E = mc^2$.
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```
+
+`remark-math` 解析公式标记，MathJax 在构建时生成 SVG，无需额外的浏览器脚本或字体下载。深浅色模式下公式跟随正文颜色，长行内和块级公式均支持横向滚动和键盘操作。LaTeX 语法错误会阻止构建，并报告公式内容和源码位置，方便在发布前修正。
+
+希望显示公式源码时，把它放在反引号或代码块里。价格中的美元符号写成 `\$`。Obsidian 插件和自定义宏配置不会自动导入。分式、矩阵、多行对齐与分段函数的效果见[数学公式示例](/zh/posts/markdown-showcase/#数学公式)。
+
+## 中英文如何配对
+
+英文使用根路径，中文使用 `/zh/`。译文保持相同的目录结构和文件名，并分别设置正确的 `lang`。
+
+```text
+src/content/posts/my-first-essay.md       -> /posts/my-first-essay/
+src/content/posts/zh/my-first-essay.md    -> /zh/posts/my-first-essay/
+src/content/videos/my-first-video.md     -> /videos/my-first-video/
+src/content/videos/zh/my-first-video.md  -> /zh/videos/my-first-video/
+```
+
+标题、摘要与正文分别维护；标签与分类标识保持一致。如果暂时没有已发布的对应译文，页面会显示可用的原文与提示。
+
+语言切换保留当前页面、筛选和页码；译文标题层级一致时，目录锚点映射到对应章节，结构不同时仅保留相同 ID，其余锚点清除。主要界面翻译位于 `src/i18n/messages/zh.json`，基础归档与搜索组件的翻译位于 `src/i18n/lang/zh.json`。两种语言均保留 **Newsletter** 这个名称。
+
+## 新增 Bilibili 视频
+
+视频与文字稿对应同一张作品卡片。在 `src/content/videos/` 新建文件，把视频信息写在 frontmatter 中，下面用 Markdown 编写文字稿。
+
+```yaml file="src/content/videos/my-first-video.md"
+---
+title: "A small system for creative work"
+description: "A video and transcript about making room to create."
+pubDatetime: 2026-10-01T08:00:00Z
+lang: en
+categories: [Creativity]
+image: "/images/creative-desk.jpg"
+label: "MAKE ROOM."
+bilibiliUrl: ""
+sample: true
+---
+```
+
+将 `bilibiliUrl` 换成真实视频地址、BV／AV 标识或 b23.tv 分享链接。直接视频地址支持官方播放器，短分享链接提供外部观看入口；空值不会绑定真实视频。设置 `featured: true` 可以加入视频归档的精选区域。
+
+在 `.env` 中设置 `PUBLIC_BILIBILI_CHANNEL_URL`，视频归档的频道按钮就会跳转到你的个人空间。
+
+## 书籍、课程与 Newsletter
+
+书架使用 `src/data/creator.ts` 的 `books` 数组。每项包含稳定的 `slug`、书名、作者、封面颜色、分类与读书笔记。课程使用同文件中的 `courses` 数组，目前展示提纲与订阅兴趣入口，尚未接入支付或学习平台。
+
+公开 Newsletter 来信位于 `src/data/letters.ts`，名称由 `creator.newsletter.name` 和 `shortName` 控制。
+
+```dotenv file=".env"
+PUBLIC_NEWSLETTER_FORM_ACTION=
+PUBLIC_NEWSLETTER_PROVIDER=
+PUBLIC_NEWSLETTER_PRIVACY_URL=
+PUBLIC_CONTACT_EMAIL=
+PUBLIC_BILIBILI_CHANNEL_URL=
+```
+
+> [!NOTE] 说明
+> 表单地址、服务商名称、隐私地址和联系邮箱四项完整时才显示订阅表单。未配置时显示“订阅尚未开放”与公开来信入口，不显示邮箱输入框。
+
+启用时，按服务要求适配标准 POST 表单字段，设置确认邮件、成功／失败页面与退订链接，并验证完整流程。表单含必选的同意项，中英文隐私页会显示服务商、隐私链接和联系邮箱。`PUBLIC_` 配置会出现在浏览器端，应填写公开地址，不能放 API 密钥。修改 `.env` 后，需要重启开发服务或重新构建。
+
+## 颜色与深浅色模式
+
+语义颜色位于 `src/styles/theme.css`。浅色与深色分别定义背景、文字、面板、边界和次要文字；共用的蓝色、珊瑚色、黄色与紫色位于 `creator.css`。
+
+```css file="src/styles/theme.css"
+[data-theme="dark"] {
+  --background: #17151b;
+  --foreground: #f5f0eb;
+  --muted: #25212a;
+  --border: #443b49;
+}
+```
+
+首次访问跟随系统主题。手动切换后，浏览器会保存选择，跨页面与语言保持一致。设置 `features.lightAndDarkMode: false` 可以关闭切换并使用浅色。
+
+修改颜色后，打开 [Markdown 示例](/zh/posts/markdown-showcase/)，一起检查文字、代码、表格、链接与提示框。
+
+## 字体与版式
+
+英文标题使用本地 **Fraunces**，正文使用 **Arimo**，字体文件配置位于 `astro.config.ts`，预加载位于 `src/layouts/Layout.astro`。中文标题与正文使用系统衬线、黑体字体栈，在 `portfolio.css` 中配置。中文分享图片另用本地 Noto Sans SC 生成标题；该字体仅用于构建分享图片，不预加载到网页。
+
+```css file="src/styles/creator.css"
+:root {
+  --serif: var(--font-fraunces);
+  --radius: 20px;
+}
+```
+
+`--font-app` 位于 `theme.css`。首页和作品卡片样式在 `portfolio.css`，文章阅读版式在 `editorial.css`，桌面正文列最大宽度为 700px。替换字体后，应一起观察标题换行、导航宽度与按钮间距。
+
+## 预览与发布
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm build
+pnpm preview
+pnpm lint
+```
+
+构建生成静态文件、中英文 Pagefind 索引，并检查站内链接、SEO、分享图片与 sitemap。作品库和页脚提供搜索入口。CI 包含单元测试与完整构建，并按 commit SHA 保存产物。`build-info.json` 记录来源版本；正式发布使用 `pnpm build:release`，会拒绝占位域名。详细上线与回滚步骤见仓库的 `docs/RELEASE.md`。将 `dist/` 部署到静态托管服务即可；搜索需要先构建索引。
+
+发布前替换示例内容与占位域名，分别查看两种语言，并在手机宽度下检查首页和长文章。返回[我的作品](/zh/works/?type=article)，可以看到这两个案例的卡片入口。

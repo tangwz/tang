@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { switchLocaleUrl, selectLocalizedEntries } from "./routing.ts";
+
+test("switching language preserves filters, pagination and fragment", () => {
+  const original = "/works/?type=video&page=2#collection";
+  const translated = switchLocaleUrl(original, "zh");
+  assert.equal(translated, "/zh/works/?type=video&page=2#collection");
+  assert.equal(switchLocaleUrl(translated, "en"), original);
+});
+
+test("locale prefixes are replaced once and respect the deployment base", () => {
+  assert.equal(
+    switchLocaleUrl("/journal/zh/posts/example/", "en", "/journal/"),
+    "/journal/posts/example/"
+  );
+  assert.equal(switchLocaleUrl("/journal/", "zh", "/journal/"), "/journal/zh/");
+  assert.equal(switchLocaleUrl("/zh/", "zh"), "/zh/");
+  assert.equal(switchLocaleUrl("/zhuang/", "zh"), "/zh/zhuang/");
+  assert.equal(switchLocaleUrl("/zh/404/", "en"), "/404.html");
+  assert.equal(switchLocaleUrl("/404.html", "zh"), "/zh/404/");
+});
+
+test("translated content is selected once with a deterministic original fallback", () => {
+  const english = { id: "examples/essay", data: { lang: "en" } };
+  const chinese = { id: "zh/examples/essay", data: { lang: "zh" } };
+  const original = { id: "another-essay", data: { lang: "en" } };
+  assert.deepEqual(selectLocalizedEntries([english, chinese, original], "zh"), [
+    chinese,
+    original,
+  ]);
+  assert.deepEqual(selectLocalizedEntries([chinese, english, original], "en"), [
+    english,
+    original,
+  ]);
+});
+
+test("a draft translation cannot hide a published original", () => {
+  const original = { id: "essay", data: { lang: "en" } };
+  const draft = { id: "zh/essay", data: { lang: "zh", draft: true } };
+  assert.deepEqual(selectLocalizedEntries([original, draft], "zh"), [original]);
+  assert.deepEqual(selectLocalizedEntries([draft], "zh"), []);
+});

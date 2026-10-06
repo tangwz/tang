@@ -1,0 +1,223 @@
+---
+title: "Configure your creator theme"
+description: "A practical guide to your identity, writing, videos, Newsletter, languages, colors, and fonts in this Astro theme."
+pubDatetime: 2026-10-04T08:00:00Z
+lang: en
+sample: true
+tags: ["Theme guide", building]
+coverColor: purple
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
+This site is a home for a writer, video creator, and developer. The homepage introduces the person; **My Work** gathers the articles, videos, reading notes, and Newsletter archive into one collection.
+
+This guide describes the creator theme in this repository. It follows the idea of AstroPaper’s [configuration guide](https://astro-paper.pages.dev/posts/how-to-configure-astropaper-theme/), with settings and examples specific to this implementation. To preview the reading styles, open the [Markdown showcase](/posts/markdown-showcase/).
+
+## Find the right file
+
+<ResponsiveTable variant="striped-minimal">
+
+| What you want to change                          | Where to change it                              |
+| :----------------------------------------------- | :---------------------------------------------- |
+| Site title, author, domain, timezone             | `astro-paper.config.ts`                         |
+| Portrait, books, course outline, Newsletter name | `src/data/creator.ts`                           |
+| Public Newsletter letters                        | `src/data/letters.ts`                           |
+| Blog posts and translations                      | `src/content/posts/`                            |
+| Bilibili videos and transcripts                  | `src/content/videos/`                           |
+| Homepage introduction and personal story         | `src/views/Home.astro`, `src/views/About.astro` |
+| Chinese interface copy                           | `src/i18n/messages/zh.json`                     |
+| Colors, typography, page spacing                 | `src/styles/`                                   |
+
+</ResponsiveTable>
+
+## Your name and site metadata
+
+Edit `site` in `astro-paper.config.ts`. The author is the shared name for the wordmark, footer, introductions, and default article author. The title and description control site metadata; keep them consistent with your identity.
+
+```ts file="astro-paper.config.ts"
+site: {
+  url: "https://example.com/",
+  title: "Terence Tang — Writer, Creator & Developer",
+  description: "Essays, videos, and ideas on technology and creativity.",
+  author: "Terence Tang",
+  ogImage: "og.png",
+  lang: "en",
+  timezone: "Asia/Shanghai",
+  dir: "ltr",
+},
+```
+
+Set `url` to your real deployment address before publishing. It is used for canonical URLs, the sitemap, and RSS. To change the description on the homepage itself, update `Home.astro` and the corresponding Chinese translation key.
+
+`posts.perIndex` controls the featured works on the homepage (six by default). `posts.perPage` controls both the work library and article lists (nine by default). Footer profiles use `socials`; article sharing uses `shareLinks`. Empty arrays hide those links.
+
+## Your portrait and introduction
+
+Place your photograph in `public/images/`, then set `creator.images.portrait`. The current empty value uses a workspace photo as a placeholder.
+
+```ts file="src/data/creator.ts"
+images: {
+  portrait: getAssetPath("images/portrait.jpg"),
+  desk: getAssetPath("images/creative-desk.jpg"),
+  writing: getAssetPath("images/writing.jpg"),
+  landscape: getAssetPath("images/landscape.jpg"),
+},
+```
+
+`getAssetPath` keeps public asset paths compatible with the configured base path. The homepage’s introduction lives in `src/views/Home.astro`, and the longer story lives in `src/views/About.astro`. Their English text is also the key used in the Chinese translation catalog, so update both together.
+
+## Publish an article
+
+Create a Markdown or MDX file inside `src/content/posts/`. Use a short, stable filename: `my-first-essay.md` becomes `/posts/my-first-essay/`.
+
+```yaml file="src/content/posts/my-first-essay.md"
+---
+title: "Make space for your next idea"
+description: "A small practice for turning curiosity into useful work."
+pubDatetime: 2026-10-01T08:00:00Z
+lang: en
+tags: [creativity, building]
+coverColor: blue
+draft: false
+sample: false
+---
+```
+
+Then write the body after the closing frontmatter delimiter. H2 headings generate the article’s table of contents.
+
+<ResponsiveTable variant="striped-minimal">
+
+| Field                                 | Behavior                                                                                         |
+| :------------------------------------ | :----------------------------------------------------------------------------------------------- |
+| `title`, `description`, `pubDatetime` | Required article metadata                                                                        |
+| `lang`                                | `en` or `zh`; defaults to `en`                                                                   |
+| `author`                              | Optional override of `site.author`                                                               |
+| `tags`                                | Topic labels; defaults to `others`                                                               |
+| `coverColor`                          | `blue`, `coral`, `yellow`, or `purple`                                                           |
+| `coverImage`                          | Optional image instead of the title cover                                                        |
+| `draft: true`                         | Excludes the article from published routes and lists                                             |
+| `sample: true`                        | Marks demonstration content; it still appears in My Work                                         |
+| `template: true`                      | Sets legacy docs to `noindex`; excludes them from works, archives, tags, search, RSS and sitemap |
+| `modDatetime`                         | Optional date for an update                                                                      |
+
+</ResponsiveTable>
+
+Production builds list an article once its publication time is reached, subject to `posts.scheduledPostMargin`. Local development shows future non-draft articles so you can preview them. Rebuild the static site when a scheduled article should go live.
+
+## Write mathematical formulas
+
+Markdown articles, MDX pages, and video transcripts support Obsidian-style LaTeX formulas. Use `$...$` inline, and put `$$` on separate lines around a display formula:
+
+```md
+Energy is $E = mc^2$.
+
+$$
+\int_0^1 x^2\,dx = \frac{1}{3}
+$$
+```
+
+`remark-math` parses the delimiters, and MathJax generates SVG during the build. No additional browser script or font download is required. Formulas follow the text color in both themes; long inline and display formulas have horizontal and keyboard scrolling. Invalid LaTeX stops the build and reports the formula and its source position so it can be corrected before publication.
+
+Keep literal formulas inside backticks or code fences. Escape a dollar sign as `\$` when writing prices. Obsidian plugins and custom macro settings are not imported automatically. Preview fractions, matrices, aligned equations, and piecewise functions in the [math showcase](/posts/markdown-showcase/#math).
+
+## Pair English and Chinese content
+
+English uses the root URL; Chinese uses `/zh/`. Pair translations with the same directory structure and filename, and set each file’s `lang` correctly.
+
+```text
+src/content/posts/my-first-essay.md       -> /posts/my-first-essay/
+src/content/posts/zh/my-first-essay.md    -> /zh/posts/my-first-essay/
+src/content/videos/my-first-video.md     -> /videos/my-first-video/
+src/content/videos/zh/my-first-video.md  -> /zh/videos/my-first-video/
+```
+
+Titles, summaries, and bodies are maintained independently. Keep tag and category identifiers consistent between versions. If a published translation is missing, the site shows the available original with a notice.
+
+The language switch keeps the page, filters, and page number. Matching heading outlines map anchors to the corresponding section; differing outlines keep shared IDs and clear the remaining anchors. Shared interface translations live in `src/i18n/messages/zh.json`; lower-level archive and search strings live in `src/i18n/lang/zh.json`. **Newsletter** stays in English in both interfaces.
+
+## Add a Bilibili video
+
+A video and its written transcript are one work item. Create a file in `src/content/videos/`, put the video metadata in frontmatter, then write the transcript as Markdown below it.
+
+```yaml file="src/content/videos/my-first-video.md"
+---
+title: "A small system for creative work"
+description: "A video and transcript about making room to create."
+pubDatetime: 2026-10-01T08:00:00Z
+lang: en
+categories: [Creativity]
+image: "/images/creative-desk.jpg"
+label: "MAKE ROOM."
+bilibiliUrl: ""
+sample: true
+---
+```
+
+Replace `bilibiliUrl` with your real Bilibili video URL, BV/AV identifier, or b23.tv share link. Direct video links support the official player; short share links provide an external watch link. An empty value leaves the example without a real player. Use `featured: true` for the video archive’s selection.
+
+Set `PUBLIC_BILIBILI_CHANNEL_URL` in `.env` to link the archive button to your own channel.
+
+## Books, courses, and Newsletter
+
+Edit `books` in `src/data/creator.ts` for the reading shelf. Each entry contains a stable `slug`, title, author, cover color, category, and reading note. Courses use the `courses` array in the same file. They currently show an outline and a subscription interest entry; no checkout or learning platform is connected.
+
+Public Newsletter letters are in `src/data/letters.ts`. The Newsletter’s display name comes from `creator.newsletter.name` and `shortName`.
+
+```dotenv file=".env"
+PUBLIC_NEWSLETTER_FORM_ACTION=
+PUBLIC_NEWSLETTER_PROVIDER=
+PUBLIC_NEWSLETTER_PRIVACY_URL=
+PUBLIC_CONTACT_EMAIL=
+PUBLIC_BILIBILI_CHANNEL_URL=
+```
+
+> [!NOTE]
+> The signup form appears only when the action URL, provider name, provider privacy URL, and contact email are all configured. Otherwise the page shows a closed-subscription notice and links to public letters, without an email input.
+
+To enable subscriptions, adapt the standard POST fields to your provider and verify confirmation emails, success/failure pages, and unsubscribe links. The form requires explicit consent, and both privacy pages show the configured provider, privacy link, and contact email. These `PUBLIC_` values are browser-visible URLs, so do not put API secrets in them. Restart development or rebuild after changing `.env`.
+
+## Colors and light/dark mode
+
+The semantic palette is in `src/styles/theme.css`. Light and dark modes each define background, text, surface, border, and muted colors. Shared blue, coral, yellow, and purple accents are defined in `creator.css`.
+
+```css file="src/styles/theme.css"
+[data-theme="dark"] {
+  --background: #17151b;
+  --foreground: #f5f0eb;
+  --muted: #25212a;
+  --border: #443b49;
+}
+```
+
+First-time visitors follow their system preference. A manual selection is saved in the browser and stays consistent across pages and languages. `features.lightAndDarkMode: false` disables switching and uses the light palette.
+
+Use the [Markdown showcase](/posts/markdown-showcase/) to inspect text contrast, code, tables, links, and callouts after changing colors.
+
+## Fonts and layout
+
+The Latin fonts are local **Fraunces** for headings and **Arimo** for body text, configured in `astro.config.ts`. Font preloads are declared in `src/layouts/Layout.astro`. Chinese uses native serif and sans-serif stacks in `portfolio.css`. Chinese sharing images use a local Noto Sans SC font at build time; this font is not preloaded on web pages.
+
+```css file="src/styles/creator.css"
+:root {
+  --serif: var(--font-fraunces);
+  --radius: 20px;
+}
+```
+
+`--font-app` is defined in `theme.css`. The homepage and work cards are in `portfolio.css`; reading layout and article styles are in `editorial.css`. The desktop reading column is capped at 700px. Keep the title, navigation, and button spacing in view when changing fonts.
+
+## Preview and publish
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm test
+pnpm build
+pnpm preview
+pnpm lint
+```
+
+The build generates static files and English/Chinese Pagefind indexes, then checks local links, SEO, sharing images and sitemap eligibility. Search links are in the work library and footer. CI includes unit tests and saves artifacts by commit SHA; `build-info.json` records their source revision. Use `pnpm build:release` for a real deployment; it rejects placeholder domains. See `docs/RELEASE.md` for publishing and rollback steps. Deploy `dist/` to your static host. Search needs a build to generate its index.
+
+Before publishing, replace demonstration content and the placeholder domain, check both languages, and view the homepage and a long article on a phone-sized screen. Return to [My Work](/works/?type=article) to see how the examples appear as cards.

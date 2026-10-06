@@ -19,7 +19,8 @@ function existsInPublic(filename: string): boolean {
  * - When disabled, requires `public/{site.ogImage}` to exist.
  */
 export function resolveDefaultOgImagePath(
-  config: ResolvedAstroPaperConfig
+  config: ResolvedAstroPaperConfig,
+  locale = "en"
 ): string {
   const filename = config.site.ogImage;
   if (
@@ -35,7 +36,7 @@ export function resolveDefaultOgImagePath(
   if (config.features.dynamicOgImage) {
     return existsInPublic(filename)
       ? getAssetPath(filename)
-      : getAssetPath("og.png");
+      : getAssetPath(locale === "zh" ? "zh/og.png" : "og.png");
   }
 
   if (!existsInPublic(filename)) {

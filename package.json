@@ -1,13 +1,17 @@
 {
-  "name": "astro-paper-v6",
+  "name": "terence-creator-theme",
   "type": "module",
-  "version": "6.1.0",
+  "version": "0.1.0",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/",
+    "build": "astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/ && pnpm check:build",
+    "test": "node --experimental-strip-types --test src/i18n/*.test.mjs src/scripts/*.test.mjs src/utils/*.test.mjs",
+    "check:build": "node --experimental-strip-types scripts/check-build.mjs",
+    "release:check": "node --experimental-strip-types scripts/check-release.mjs",
+    "build:release": "node --experimental-strip-types scripts/check-release.mjs --config-only && pnpm build && pnpm release:check",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
@@ -16,6 +20,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@astrojs/markdown-remark": "^7.2.0",
     "@astrojs/mdx": "^7.0.0",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
@@ -23,9 +28,11 @@
     "astro": "^7.0.3",
     "dayjs": "^1.11.21",
     "lodash.kebabcase": "^4.1.1",
-    "@astrojs/markdown-remark": "^7.2.0",
+    "mathjax-full": "^3.2.1",
     "rehype-callouts": "^2.2.0",
+    "rehype-mathjax": "^7.1.0",
     "remark-collapse": "^0.1.2",
+    "remark-math": "^6.0.0",
     "remark-toc": "^9.0.0",
     "satori": "^0.26.0",
     "sharp": "^0.35.2",
@@ -41,6 +48,7 @@
     "@typescript-eslint/parser": "^8.62.0",
     "eslint": "^10.6.0",
     "eslint-plugin-astro": "^2.1.1",
+    "hast-util-from-html": "^2.0.3",
     "pagefind": "^1.5.2",
     "prettier": "3.9.3",
     "prettier-plugin-astro": "0.14.1",

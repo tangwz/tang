@@ -1,0 +1,248 @@
+---
+title: "Markdown 排版示例"
+description: "标题、列表、代码、公式、表格、提示框、图片与脚注：在一个页面里查看主题的完整阅读排版。"
+pubDatetime: 2026-10-05T08:00:00Z
+lang: zh
+sample: true
+tags: ["Theme guide", writing]
+coverColor: blue
+---
+
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+import { getAssetPath } from "@/utils/withBase";
+
+好的文字，值得一个舒适的阅读空间。这篇示例把文章与视频文字稿中常用的元素放在一起，方便你对照查看**浅色与深色模式**下的实际效果。
+
+试试右侧目录、代码复制按钮和图片预览。想了解这些页面如何配置，可以继续阅读[主题配置指南](/zh/posts/theme-configuration/)。
+
+## 文字与链接
+
+普通段落决定阅读的节奏。你可以用**加粗**强调重点，用*斜体*调整语气，用~~删除线~~保留修改痕迹。行内代码 `pnpm dev` 则让命令与解释保持在同一句话里。
+
+链接可以指向[另一篇文章](/zh/posts/build-small-stay-curious/)、[当前页面的表格](#表格)，或者[外部参考](https://astro-paper.pages.dev/posts/astro-paper-v6/)。这是一篇为当前创作者主题编写的排版示例，结构参考 AstroPaper 的版本介绍。
+
+需要补充背景时，也可以使用脚注，不打断当前段落。[^specimen] 两个空格可以创建强制换行，例如一小段诗：
+
+先提出一个问题。  
+做一点有用的东西。  
+给好奇心留一点位置。
+
+## 标题层级
+
+页面标题已经是 H1，正文从 H2 开始。二级标题会自动出现在目录中，下面展示三级到六级标题的大小与间距。
+
+### 三级标题：展开一个想法
+
+用于一个章节内的子话题。
+
+#### 四级标题：补充具体细节
+
+当子话题还需要进一步说明时使用。
+
+##### 五级标题：更小的层级
+
+字号缩小，但保留一致的标题字形。
+
+###### 六级标题：层级的末端
+
+文章通常不需要这么深的嵌套；让读者能够自然跟随你的思路。
+
+## 列表与任务
+
+无序列表适合几条并列的想法：
+
+- 留出一小段专注时间。
+- 随手放一本笔记本。
+  - 先记下问题，再寻找答案。
+  - 从失败的实验里保存有用的部分。
+- 分享今天学到的一件事。
+
+有序列表适合需要按顺序执行的步骤：
+
+1. 找到一个值得解决的问题。
+2. 做出最小可用版本。
+   1. 解释它能做什么。
+   2. 邀请一个人试用。
+3. 根据观察到的反馈改进。
+
+任务列表可以表达进度。这里是 Markdown 生成的静态复选框，不会保存交互状态：
+
+- [x] 写下初稿。
+- [x] 补上一个例子。
+- [ ] 换成你自己的故事。
+
+## 引用与提示框
+
+> 有用的创作习惯，是你可以不断回到其中的习惯。选择一个能够持续的节奏，让自己还有注意力观察正在学到什么。
+>
+> —— 这篇示例中的一条笔记
+
+提示框让补充信息拥有独立的空间：
+
+> [!NOTE] 说明
+> 文章与视频文字稿共用阅读版式。正文中的二级标题会自动生成目录链接。
+
+> [!TIP] 小提示
+> 把图片放在对应解释附近，读者就不必来回寻找上下文。
+
+> [!WARNING] 注意
+> 这些页面用于演示主题。正式发布前，请把示例标题、摘要和素材替换为自己的内容。
+
+## 代码块
+
+代码块支持语法高亮、文件名标签和复制按钮。过长的代码行会在代码块内部横向滚动。
+
+```ts file="src/lib/greeting.ts"
+type Reader = {
+  name: string;
+  language: "en" | "zh";
+};
+
+export function greet(reader: Reader): string {
+  return `Hello, ${reader.name}. Make something worth sharing.`;
+}
+```
+
+你可以高亮整行，也可以强调某个词：
+
+```ts file="src/lib/publishing.ts"
+// [!code word:published]
+const published = true; // [!code highlight]
+const title = "Make room for good work";
+
+if (published) {
+  console.log(title);
+}
+```
+
+展示修改前后时，可以使用差异标记：
+
+```ts file="src/lib/preferences.ts"
+const preference = "light"; // [!code --]
+const preference = "system"; // [!code ++]
+```
+
+下面是一段包含长命令的 Shell 示例：
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+curl --header "Accept: application/json" https://example.com/api/articles?language=en\&category=building\&include=description,publishedAt,readingTime
+```
+
+## 表格
+
+表格适合比较不同选项。这个示例分别使用左对齐、居中和右对齐；手机上可以在表格范围内横向滚动。
+
+<ResponsiveTable variant="striped-minimal">
+
+| 内容形式        |      来源      | 阅读时间 |
+| :-------------- | :------------: | -------: |
+| 博客文章        |    Markdown    |   6 分钟 |
+| 视频与文字稿    | MDX + Bilibili |  12 分钟 |
+| 读书笔记        |    书籍集合    |   4 分钟 |
+| Newsletter 归档 |    公开来信    |   3 分钟 |
+
+</ResponsiveTable>
+
+## 数学公式
+
+沿用 Obsidian 的 LaTeX 写法：`$...$` 表示行内公式，单独两行的 `$$...$$` 表示块级公式。文章、MDX 页面和视频文字稿共用这套支持。MathJax 在构建时生成公式，浏览器无需加载额外的渲染脚本或远程字体。
+
+行内公式可以自然放进句子：$E = mc^2$、$e^{i\pi} + 1 = 0$，以及 $\alpha \in \mathbb{R}$。不等式也可以直接写大于号：$x > 0$。
+
+```md
+Inline: $E = mc^2$.
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+```
+
+一元二次方程的求根公式，包含分式、根号与正负号：
+
+$$
+x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+$$
+
+用 `aligned` 对齐多行公式：
+
+$$
+\begin{aligned}
+\nabla \cdot \mathbf{E} &= \frac{\rho}{\varepsilon_0} \\
+\int_0^1 x^2\,dx &= \left[\frac{x^3}{3}\right]_0^1 = \frac{1}{3}
+\end{aligned}
+$$
+
+矩阵用 `&` 分隔列，用 `\\` 换行：
+
+$$
+A = \begin{pmatrix} a & b \\ c & d \end{pmatrix},
+\qquad \det(A) = ad - bc
+$$
+
+分段函数使用 `cases` 环境：
+
+$$
+|x| = \begin{cases} x, & x \geq 0 \\ -x, & x < 0 \end{cases}
+$$
+
+较长的行内公式在手机上也可以单独横向滚动：$\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log p_{\theta}(x_i) + (1-y_i)\log\left(1-p_{\theta}(x_i)\right)\right] + \lambda\sum_{j=1}^{d}\theta_j^2$。
+
+块级公式保留同样的滚动方式。键盘聚焦公式后，可以用方向键滚动：
+
+$$
+\mathcal{L}(\theta) = -\frac{1}{N}\sum_{i=1}^{N}\left[y_i\log p_{\theta}(x_i) + (1-y_i)\log\left(1-p_{\theta}(x_i)\right)\right] + \lambda\sum_{j=1}^{d}\theta_j^2
+$$
+
+块级不等式同样可以直接使用大于号：
+
+$$
+x > 0
+$$
+
+代码示例中的美元符号保持原样。普通文字里的价格可以写成 `\$20`，显示为 \$20。以上示例使用标准 LaTeX 命令；Obsidian 插件和自定义宏不会自动导入。
+
+## 图片与图注
+
+图片可以为长篇解释带来一次停顿。点击图片，或通过键盘聚焦后按 Enter，可以打开预览；按 Escape 关闭。
+
+<figure>
+  <img
+    src={getAssetPath("images/writing.jpg")}
+    alt="写作桌上的笔记本，记录着手写想法"
+    width="1200"
+    height="800"
+    loading="lazy"
+  />
+  <figcaption>
+    在想法成为文章之前，给它留一小块空间。图片为主题演示素材。
+  </figcaption>
+</figure>
+
+## 分隔线与细节
+
+一条分隔线，可以在故事的两个部分之间留出停顿。
+
+---
+
+HTML 还可以表达一些细节，例如快捷键 <kbd>⌘</kbd> + <kbd>K</kbd>、<mark>给思考留白</mark>、下标 H<sub>2</sub>O，以及上标 x<sup>2</sup>。
+
+<details>
+  <summary>Markdown 与 MDX 有什么区别？</summary>
+  <p>
+    Markdown 适合日常写作中的标题、链接、图片、列表和代码。MDX
+    可以额外导入组件，例如本页使用的响应式表格。
+  </p>
+  <p>
+    普通文章使用 .md 文件，需要组件时使用 .mdx。两者都放在同一个内容集合中。
+  </p>
+</details>
+
+Mermaid 图表仍需额外的渲染插件，当前 `mermaid` 代码块会显示源代码。
+
+## 把它用起来
+
+选择真正帮助读者理解的元素，然后让文字成为主角。你可以阅读[配置指南](/zh/posts/theme-configuration/)修改作者、颜色、字体与内容，或者返回[全部文章](/zh/works/?type=article)。
+
+[^specimen]: 修改主题后，也可以用这个示例检查文字对比度、行距、链接与代码样式。

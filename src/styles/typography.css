@@ -9,6 +9,8 @@
     h2,
     h3,
     h4,
+    h5,
+    h6,
     th {
       @apply text-foreground mb-3;
     }
@@ -98,7 +100,11 @@
     }
 
     details:not(.callout) {
-      @apply text-foreground inline-block cursor-pointer select-none [&_p]:hidden [&_ul]:my-0!;
+      @apply text-foreground my-6 block;
+    }
+
+    details:not(.callout) > summary {
+      @apply cursor-pointer;
     }
 
     summary {

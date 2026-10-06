@@ -1,4 +1,5 @@
 ---
+template: true
 title: How Do I Develop My Terminal Portfolio Website with React
 author: Sat Naing
 pubDatetime: 2022-06-09T03:42:51Z
