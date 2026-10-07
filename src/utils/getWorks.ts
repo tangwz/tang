@@ -24,6 +24,7 @@ export type WorkItem = {
   description: string;
   href: string;
   date?: Date;
+  timezone?: string;
   image?: string;
   label?: string;
   book?: (typeof books)[number];
@@ -49,6 +50,7 @@ export async function getWorks(locale: string): Promise<WorkItem[]> {
       description: post.data.description,
       href: getPostUrl(post.id, post.filePath, locale),
       date: post.data.pubDatetime,
+      timezone: post.data.timezone,
       sample: post.data.sample,
       image:
         getCoverImagePath(post.data.coverImage) ??

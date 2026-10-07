@@ -1,6 +1,7 @@
 import messages from "./messages/zh.json";
 import { resolveLocale } from "./routing";
 import config from "@/config";
+import { formatDateInTimezone } from "./format";
 
 const catalog: Record<string, string> = messages;
 
@@ -18,15 +19,8 @@ export function useCreatorTranslations(locale?: string) {
 export function formatDate(
   date: Date,
   locale?: string,
-  month: "long" | "short" = "long"
+  month: "long" | "short" = "long",
+  timeZone = config.site.timezone
 ) {
-  return date.toLocaleDateString(
-    resolveLocale(locale) === "zh" ? "zh-CN" : "en-US",
-    {
-      month,
-      day: "numeric",
-      year: "numeric",
-      timeZone: config.site.timezone,
-    }
-  );
+  return formatDateInTimezone(date, locale, month, timeZone);
 }

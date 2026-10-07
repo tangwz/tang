@@ -5,11 +5,12 @@ import config from "@/config";
 import { creator } from "@/data/creator";
 type Props = {
   date: Date;
+  timezone?: string;
   author?: string;
   title: string;
   canonicalURL?: string;
 };
-const { date, author = creator.name, canonicalURL } = Astro.props;
+const { date, timezone, author = creator.name, canonicalURL } = Astro.props;
 const url = encodeURIComponent(
   canonicalURL ?? new URL(Astro.url.pathname, Astro.site).href
 );
@@ -40,7 +41,7 @@ const shares = (
 <div class="article-meta" data-pagefind-ignore>
   <div class="article-author">
     {
-      creator.images.portrait ? (
+      author === creator.name && creator.images.portrait ? (
         <img src={creator.images.portrait} alt="" width="60" height="60" />
       ) : (
         <span class="author-monogram" aria-hidden="true">
@@ -52,7 +53,7 @@ const shares = (
   </div>
   <span class="meta-divider" aria-hidden="true">/</span>
   <time datetime={date.toISOString()}
-    >{formatDate(date, Astro.currentLocale)}</time
+    >{formatDate(date, Astro.currentLocale, "long", timezone)}</time
   >
   {
     shares.length > 0 && (

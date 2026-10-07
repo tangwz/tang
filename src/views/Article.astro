@@ -48,6 +48,7 @@ const {
   modDatetime,
   tags,
   author,
+  timezone,
   coverImage,
   coverColor,
 } = post.data;
@@ -89,6 +90,7 @@ const ogImage = ogImageUrl ? new URL(ogImageUrl, Astro.site).href : undefined;
   <EditorialPage
     {title}
     date={pubDatetime}
+    {timezone}
     {author}
     category={tags.find(tag => tag !== "theme-sample") ?? "Ideas"}
     {headings}

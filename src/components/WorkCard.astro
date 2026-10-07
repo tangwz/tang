@@ -71,7 +71,12 @@ const actions = {
         {
           work.date && (
             <time datetime={work.date.toISOString()}>
-              {formatDate(work.date, Astro.currentLocale, "short")}
+              {formatDate(
+                work.date,
+                Astro.currentLocale,
+                "short",
+                work.timezone
+              )}
             </time>
           )
         }

@@ -17,6 +17,7 @@ type Props = {
   contentLanguage?: string;
   title: string;
   date: Date;
+  timezone?: string;
   author?: string;
   category: string;
   kind?: "article" | "video";
@@ -33,6 +34,7 @@ const {
   contentLanguage,
   title,
   date,
+  timezone,
   author,
   category,
   kind = "article",
@@ -71,7 +73,7 @@ const tocLabel = tr(
         ><span class="topic-pill pill-yellow">{tr(category)}</span>
       </div>
       <h1>{title}</h1>
-      <ArticleMeta {title} {date} {author} {canonicalURL} />
+      <ArticleMeta {title} {date} {timezone} {author} {canonicalURL} />
     </div>
   </div>
   <div class="editorial-grid wide-container">
