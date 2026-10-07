@@ -11,6 +11,7 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import { getLocaleAnchors } from "@/utils/getLocaleAnchors";
 import config from "@/config";
 import { isCreatorPost } from "@/utils/getCreatorPosts";
+import { getCoverImagePath } from "@/utils/withBase";
 
 type AdjacentPost = {
   id: string;
@@ -31,10 +32,7 @@ const relatedItems = relatedPosts.map(item => ({
   title: item.data.title,
   description: item.data.description,
   href: getPostUrl(item.id, item.filePath, locale),
-  image:
-    typeof item.data.coverImage === "string"
-      ? item.data.coverImage
-      : item.data.coverImage?.src,
+  image: getCoverImagePath(item.data.coverImage),
   color: item.data.coverColor,
 }));
 
@@ -93,7 +91,7 @@ const ogImage = ogImageUrl ? new URL(ogImageUrl, Astro.site).href : undefined;
     {localeAnchors}
     sample={post.data.sample}
     {coverColor}
-    coverImage={typeof coverImage === "string" ? coverImage : coverImage?.src}
+    coverImage={getCoverImagePath(coverImage)}
     {canonicalURL}
     contentLanguage={post.data.lang}
     searchable={isCreatorPost(post)}

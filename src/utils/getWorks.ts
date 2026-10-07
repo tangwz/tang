@@ -7,7 +7,7 @@ import { getLocalizedPosts, getLocalizedVideos } from "./getLocalizedContent";
 import { getCreatorPosts } from "./getCreatorPosts";
 import { getCreatorVideos } from "./getCreatorVideos";
 import { getPostUrl } from "./getPostPaths";
-import { getAssetPath } from "./withBase";
+import { getAssetPath, getCoverImagePath } from "./withBase";
 
 export const workTypes = [
   { value: "all", label: "All work" },
@@ -51,9 +51,7 @@ export async function getWorks(locale: string): Promise<WorkItem[]> {
       date: post.data.pubDatetime,
       sample: post.data.sample,
       image:
-        (typeof post.data.coverImage === "string"
-          ? post.data.coverImage
-          : post.data.coverImage?.src) ??
+        getCoverImagePath(post.data.coverImage) ??
         articleImages[index % articleImages.length],
     })),
     ...getCreatorVideos(videos).map(video => ({

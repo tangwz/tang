@@ -3,6 +3,7 @@ import { z } from "astro/zod";
 import { glob } from "astro/loaders";
 import config from "@/config";
 import { resolveBilibiliVideo } from "./utils/bilibili";
+import { isPublicImagePath } from "./utils/assetPaths";
 
 export const BLOG_PATH = "src/content/posts";
 
@@ -21,7 +22,8 @@ const posts = defineCollection({
       sample: z.boolean().default(false),
       tags: z.array(z.string()).default(["others"]),
       ogImage: image().or(z.string()).optional(),
-      coverImage: image().or(z.string()).optional(),
+      // Astro's image helper treats every string as an import.
+      coverImage: z.string().refine(isPublicImagePath).or(image()).optional(),
       coverColor: z.enum(["blue", "coral", "yellow", "purple"]).default("blue"),
       description: z.string(),
       canonicalURL: z.string().optional(),
