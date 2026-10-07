@@ -12,7 +12,7 @@ import ResponsiveTable from "@/components/ResponsiveTable.astro";
 
 This site is a home for a writer, video creator, and developer. The homepage introduces the person; **My Work** gathers the articles, videos, reading notes, and Newsletter archive into one collection.
 
-This guide describes the creator theme in this repository. It follows the idea of AstroPaper’s [configuration guide](https://astro-paper.pages.dev/posts/how-to-configure-astropaper-theme/), with settings and examples specific to this implementation. To preview the reading styles, open the [Markdown showcase](/posts/markdown-showcase/).
+This guide describes the creator theme in this repository. It follows the idea of AstroPaper’s [configuration guide](https://astro-paper.pages.dev/posts/how-to-configure-astropaper-theme/), with settings and examples specific to this implementation. To preview the reading styles, open the [Markdown showcase](../markdown-showcase/).
 
 ## Find the right file
 
@@ -119,7 +119,7 @@ $$
 
 `remark-math` parses the delimiters, and MathJax generates SVG during the build. No additional browser script or font download is required. Formulas follow the text color in both themes; long inline and display formulas have horizontal and keyboard scrolling. Invalid LaTeX stops the build and reports the formula and its source position so it can be corrected before publication.
 
-Keep literal formulas inside backticks or code fences. Escape a dollar sign as `\$` when writing prices. Obsidian plugins and custom macro settings are not imported automatically. Preview fractions, matrices, aligned equations, and piecewise functions in the [math showcase](/posts/markdown-showcase/#math).
+Keep literal formulas inside backticks or code fences. Escape a dollar sign as `\$` when writing prices. Obsidian plugins and custom macro settings are not imported automatically. Preview fractions, matrices, aligned equations, and piecewise functions in the [math showcase](../markdown-showcase/#math).
 
 ## Pair English and Chinese content
 
@@ -192,7 +192,7 @@ The semantic palette is in `src/styles/theme.css`. Light and dark modes each def
 
 First-time visitors follow their system preference. A manual selection is saved in the browser and stays consistent across pages and languages. `features.lightAndDarkMode: false` disables switching and uses the light palette.
 
-Use the [Markdown showcase](/posts/markdown-showcase/) to inspect text contrast, code, tables, links, and callouts after changing colors.
+Use the [Markdown showcase](../markdown-showcase/) to inspect text contrast, code, tables, links, and callouts after changing colors.
 
 ## Fonts and layout
 
@@ -220,4 +220,4 @@ pnpm lint
 
 The build generates static files and English/Chinese Pagefind indexes, then checks local links, SEO, sharing images and sitemap eligibility. Search links are in the work library and footer. CI includes unit tests and saves artifacts by commit SHA; `build-info.json` records their source revision. Use `pnpm build:release` for a real deployment; it rejects placeholder domains. See `docs/RELEASE.md` for publishing and rollback steps. Deploy `dist/` to your static host. Search needs a build to generate its index.
 
-Before publishing, replace demonstration content and the placeholder domain, check both languages, and view the homepage and a long article on a phone-sized screen. Return to [My Work](/works/?type=article) to see how the examples appear as cards.
+Before publishing, replace demonstration content and the placeholder domain, check both languages, and view the homepage and a long article on a phone-sized screen. Return to [My Work](../../works/?type=article) to see how the examples appear as cards.

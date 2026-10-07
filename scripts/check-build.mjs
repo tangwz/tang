@@ -1,12 +1,19 @@
 import assert from "node:assert/strict";
 import { readdir, readFile, stat, writeFile } from "node:fs/promises";
-import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { resolve, sep } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import config from "../astro-paper.config.ts";
 import { getMathErrors } from "../src/utils/mathValidation.ts";
+import { getOutputPath } from "../src/utils/buildPaths.ts";
 
-const root = new URL("../dist/", import.meta.url);
-const site = new URL(config.site.url);
+const root = process.argv[2]
+  ? pathToFileURL(resolve(process.argv[2]) + sep)
+  : new URL("../dist/", import.meta.url);
+const info = JSON.parse(
+  await readFile(new URL("build-info.json", root), "utf8")
+);
+const site = new URL(info.site);
+const base = info.base ?? "/";
 const errors = [];
 const decode = value => value.replace(/&amp;/g, "&");
 const exists = async url =>
@@ -59,9 +66,17 @@ for (const [path, html] of htmlByPath) {
     errors.push(`Missing description: ${path}`);
   for (const match of html.matchAll(/\b(?:href|src)="([^"]+)"/g)) {
     const value = decode(match[1]);
-    if (!value.startsWith("/") || value.startsWith("//")) continue;
-    const url = new URL(value, site);
-    const target = decodeURIComponent(url.pathname).replace(/^\//, "");
+    if (/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(value)) continue;
+    const pageURL = new URL(base.replace(/\/+$/, "") + path, site);
+    const url = new URL(value, pageURL);
+    const outputPath = getOutputPath(url.pathname, base);
+    if (outputPath === undefined) {
+      errors.push(
+        "Local URL outside the deployment base on " + path + ": " + value
+      );
+      continue;
+    }
+    const target = outputPath.slice(1);
     const direct = new URL(target, root);
     const index = new URL(
       `${target.replace(/\/+$/, "")}/index.html`.replace(/^\//, ""),
@@ -75,9 +90,11 @@ for (const [path, html] of htmlByPath) {
   )?.[1];
   if (social) {
     const image = new URL(decode(social));
+    const imagePath = getOutputPath(image.pathname, base);
     if (
       image.origin === site.origin &&
-      !(await exists(new URL(image.pathname.slice(1), root)))
+      (imagePath === undefined ||
+        !(await exists(new URL(imagePath.slice(1), root))))
     )
       errors.push(`Missing social image: ${path}`);
   }
@@ -88,14 +105,17 @@ const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(
   match => new URL(decode(match[1]))
 );
 for (const url of urls) {
-  const html = htmlByPath.get(url.pathname);
+  const html = htmlByPath.get(getOutputPath(url.pathname, base));
   if (!html || noindex(html))
     errors.push(`Non-indexable sitemap URL: ${url.pathname}`);
   if (url.origin !== site.origin)
     errors.push(`Wrong sitemap origin: ${url.href}`);
 }
 for (const [path, html] of htmlByPath) {
-  if (!noindex(html) && !urls.some(url => url.pathname === path))
+  if (
+    !noindex(html) &&
+    !urls.some(url => getOutputPath(url.pathname, base) === path)
+  )
     errors.push(`Missing sitemap URL: ${path}`);
 }
 for (const prefix of ["", "zh/"]) {
@@ -127,26 +147,12 @@ if (config.features?.search !== false)
     "Missing Pagefind production index"
   );
 if (errors.length) throw new Error(errors.join("\n"));
-
-let revision = null;
-let dirty = true;
-try {
-  dirty = Boolean(
-    execFileSync("git", ["status", "--porcelain"], { encoding: "utf8" }).trim()
-  );
-  revision = dirty
-    ? null
-    : execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-} catch {
-  /* Source archives may not include Git metadata. */
-}
-const pkg = JSON.parse(
-  await readFile(new URL("../package.json", import.meta.url), "utf8")
-);
+info.validated = true;
 await writeFile(
   new URL("build-info.json", root),
-  `${JSON.stringify({ name: pkg.name, version: pkg.version, site: site.href, revision, dirty, builtAt: new Date().toISOString() }, null, 2)}\n`
+  JSON.stringify(info, null, 2) + "\n"
 );
+
 process.stdout.write(
   `Static output validated: ${htmlFiles.length} HTML pages, ${urls.length} indexable URLs.\n`
 );

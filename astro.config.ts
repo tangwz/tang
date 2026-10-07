@@ -7,6 +7,7 @@ import {
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { indexableSitemap } from "./src/utils/indexableSitemap";
+import { buildMetadata } from "./src/utils/buildMetadata";
 import { unified } from "@astrojs/markdown-remark";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
@@ -25,7 +26,7 @@ import config from "./astro-paper.config";
 export default defineConfig({
   site: config.site.url,
   devToolbar: { enabled: false },
-  integrations: [mdx(), indexableSitemap()],
+  integrations: [mdx(), indexableSitemap(), buildMetadata()],
   i18n: {
     locales: ["en", "zh"],
     defaultLocale: "en",
