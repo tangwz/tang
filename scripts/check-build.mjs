@@ -170,6 +170,18 @@ for (const prefix of ["", "zh/"]) {
     if (outputPath === undefined || !htmlByPath.has(outputPath))
       errors.push(`Broken RSS local URL: ${prefix}rss.xml: ${link.href}`);
   }
+  const feedLocale = prefix ? "zh" : "en";
+  for (const match of rss.matchAll(
+    /<item\b[^>]*>[\s\S]*?<link>(.*?)<\/link>/g
+  )) {
+    const link = new URL(decode(match[1]));
+    const html = htmlByPath.get(getOutputPath(link.pathname, base));
+    const language = html?.match(/<html\b[^>]*\blang="([^"]+)"/)?.[1];
+    if (html && (noindex(html) || language !== feedLocale))
+      errors.push(
+        `RSS item must use an indexable ${feedLocale} article: ${prefix}rss.xml: ${link.href}`
+      );
+  }
 }
 assert.ok(
   await exists(new URL("404.html", root)),

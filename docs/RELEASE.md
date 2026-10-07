@@ -53,7 +53,7 @@ pnpm preview
 
 CI 保存 `site-<commit-sha>` 产物；其中的 `build-info.json` 记录构建版本、时间、站点域名、实际部署 base、revision 和 dirty 状态。平台确定后，可以直接部署同一份静态产物；无需现场重新生成。
 
-如果部署在域名的子路径，设置 `astro.config.ts` 的 `base`。构建校验使用产物中记录的实际 base，将 URL 映射到输出目录；分享图片、sitemap、robots.txt 中的 sitemap 地址和 RSS 链接也采用同一规则。中英文 RSS 的频道链接分别指向对应语言的首页。
+如果部署在域名的子路径，设置 `astro.config.ts` 的 `base`。构建校验使用产物中记录的实际 base，将 URL 映射到输出目录；分享图片、sitemap、robots.txt 中的 sitemap 地址和 RSS 链接也采用同一规则。中英文 RSS 的频道链接分别指向对应语言的首页，只收录该语言已发布的文章，不收录未翻译的回退页面。
 
 保留最近一次正式发布的产物与 revision。回滚时重新部署已验证的上一份完整产物，或使用托管平台已有的部署回滚能力；不要混合两个构建的 HTML 和 Pagefind 索引。CI 产物默认保留 14 天，更长的保存周期由最终托管平台或发布归档管理。
 

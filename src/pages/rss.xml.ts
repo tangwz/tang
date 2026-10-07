@@ -8,7 +8,9 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 
 export async function createRss(locale: string) {
   const posts = await getLocalizedPosts(locale);
-  const sortedPosts = getCreatorPosts(posts);
+  const sortedPosts = getCreatorPosts(
+    posts.filter(post => post.data.lang === locale)
+  );
 
   return rss({
     title: translate(locale, config.site.title),
