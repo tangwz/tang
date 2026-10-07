@@ -10,10 +10,3 @@ export function getCreatorVideos(videos: CreatorVideo[]) {
       (a, b) => b.data.pubDatetime.getTime() - a.data.pubDatetime.getTime()
     );
 }
-
-export const videoCategories = [
-  { slug: "productivity", name: "Productivity", color: "yellow" },
-  { slug: "programming", name: "Programming", color: "blue" },
-  { slug: "creating", name: "Creating", color: "purple" },
-  { slug: "business", name: "Business", color: "coral" },
-] as const;

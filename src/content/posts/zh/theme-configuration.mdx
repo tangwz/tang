@@ -156,6 +156,8 @@ sample: true
 
 将 `bilibiliUrl` 换成真实视频地址、BV／AV 标识或 b23.tv 分享链接。直接视频地址支持官方播放器，短分享链接提供外部观看入口；空值不会绑定真实视频。设置 `featured: true` 可以加入视频归档的精选区域。
 
+视频归档会根据已发布视频的分类生成对应区域，支持 `Creativity` 等自定义名称；无需设置为精选，视频也会出现在自己的分类中。
+
 在 `.env` 中设置 `PUBLIC_BILIBILI_CHANNEL_URL`，视频归档的频道按钮就会跳转到你的个人空间。
 
 ## 书籍、课程与 Newsletter
