@@ -3,7 +3,12 @@ import { Font } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
 import { resolveDefaultOgImagePath } from "@/utils/resolveDefaultOgImagePath";
 import { getAssetPath } from "@/utils/withBase";
-import { switchLocaleUrl, resolveLocale } from "@/i18n/routing";
+import {
+  switchLocaleUrl,
+  resolveLocale,
+  locales,
+  type Locale,
+} from "@/i18n/routing";
 import { translate } from "@/i18n/creator";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import config from "@/config";
@@ -20,6 +25,7 @@ type Props = {
   /** Use native navigation on pages that manage their own filter history. */
   clientRouting?: boolean;
   indexable?: boolean;
+  availableLocales?: readonly Locale[];
 };
 
 const { site } = config;
@@ -27,6 +33,7 @@ const { site } = config;
 const {
   clientRouting = true,
   indexable = true,
+  availableLocales = locales,
   title = translate(Astro.currentLocale, site.title),
   description = translate(Astro.currentLocale, site.description),
   ogImage = resolveDefaultOgImagePath(config, Astro.currentLocale),
@@ -35,6 +42,9 @@ const {
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
 const locale = resolveLocale(Astro.currentLocale);
+const defaultLocale = availableLocales.includes("en")
+  ? "en"
+  : availableLocales[0];
 const rssHref = getRelativeLocaleUrl(locale, "rss.xml").replace(/\/+$/, "");
 ---
 
@@ -51,7 +61,7 @@ const rssHref = getRelativeLocaleUrl(locale, "rss.xml").replace(/\/+$/, "");
     <link rel="icon" type="image/svg+xml" href={getAssetPath("favicon.svg")} />
     <link rel="canonical" href={canonicalURL} />
     {
-      (["en", "zh"] as const).map(language => (
+      availableLocales.map(language => (
         <link
           rel="alternate"
           hreflang={language === "zh" ? "zh-CN" : "en"}
@@ -68,14 +78,24 @@ const rssHref = getRelativeLocaleUrl(locale, "rss.xml").replace(/\/+$/, "");
         />
       ))
     }
-    <link
-      rel="alternate"
-      hreflang="x-default"
-      href={new URL(
-        switchLocaleUrl(Astro.url.pathname, "en", import.meta.env.BASE_URL),
-        Astro.site
-      )}
-    />
+    {
+      defaultLocale && (
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={
+            new URL(
+              switchLocaleUrl(
+                Astro.url.pathname,
+                defaultLocale,
+                import.meta.env.BASE_URL
+              ),
+              Astro.site
+            )
+          }
+        />
+      )
+    }
     <meta name="generator" content={Astro.generator} />
 
     <!-- Font -->
@@ -102,10 +122,16 @@ const rssHref = getRelativeLocaleUrl(locale, "rss.xml").replace(/\/+$/, "");
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={locale === "zh" ? "zh_CN" : "en_US"} />
-    <meta
-      property="og:locale:alternate"
-      content={locale === "zh" ? "en_US" : "zh_CN"}
-    />
+    {
+      availableLocales
+        .filter(language => language !== locale)
+        .map(language => (
+          <meta
+            property="og:locale:alternate"
+            content={language === "zh" ? "zh_CN" : "en_US"}
+          />
+        ))
+    }
     <meta property="og:site_name" content={site.title} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />

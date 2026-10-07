@@ -1,6 +1,15 @@
-import { getCollection } from "astro:content";
-import { selectLocalizedEntries } from "@/i18n/routing";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { selectLocalizedEntries, getEntryLocales } from "@/i18n/routing";
 import { postFilter } from "./postFilter";
+
+export async function getContentLocales(
+  entry: CollectionEntry<"posts" | "videos">
+) {
+  return getEntryLocales(
+    entry,
+    await getCollection(entry.collection, postFilter)
+  );
+}
 
 export async function getLocalizedPosts(locale: string) {
   const posts = await getCollection("posts", postFilter);

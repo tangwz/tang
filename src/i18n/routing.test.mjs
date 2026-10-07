@@ -1,6 +1,25 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { switchLocaleUrl, selectLocalizedEntries } from "./routing.ts";
+import {
+  switchLocaleUrl,
+  selectLocalizedEntries,
+  getEntryLocales,
+} from "./routing.ts";
+
+test("content alternates include only real language entries for the same slug", () => {
+  const english = { id: "examples/essay", data: { lang: "en" } };
+  const chinese = { id: "zh/examples/essay", data: { lang: "zh" } };
+  const unrelated = { id: "zh/another-essay", data: { lang: "zh" } };
+  assert.deepEqual(getEntryLocales(english, [english, unrelated]), ["en"]);
+  assert.deepEqual(getEntryLocales(chinese, [chinese]), ["zh"]);
+  assert.deepEqual(getEntryLocales(english, [chinese, english]), ["en", "zh"]);
+});
+
+test("draft translations never become public language alternates", () => {
+  const original = { id: "essay", data: {} };
+  const draft = { id: "zh/essay", data: { lang: "zh", draft: true } };
+  assert.deepEqual(getEntryLocales(original, [original, draft]), ["en"]);
+});
 
 test("switching language preserves filters, pagination and fragment", () => {
   const original = "/works/?type=video&page=2#collection";

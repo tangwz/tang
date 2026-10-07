@@ -12,6 +12,8 @@ import { getLocaleAnchors } from "@/utils/getLocaleAnchors";
 import config from "@/config";
 import { isCreatorPost } from "@/utils/getCreatorPosts";
 import { getCoverImagePath } from "@/utils/withBase";
+import { getContentLocales } from "@/utils/getLocalizedContent";
+import { resolveLocale } from "@/i18n/routing";
 
 type AdjacentPost = {
   id: string;
@@ -27,7 +29,8 @@ type Props = {
 };
 
 const { post, prevPost, nextPost, relatedPosts } = Astro.props;
-const locale = Astro.currentLocale ?? config.site.lang;
+const locale = resolveLocale(Astro.currentLocale ?? config.site.lang);
+const availableLocales = await getContentLocales(post);
 const relatedItems = relatedPosts.map(item => ({
   title: item.data.title,
   description: item.data.description,
@@ -75,6 +78,7 @@ const ogImage = ogImageUrl ? new URL(ogImageUrl, Astro.site).href : undefined;
   indexable={isCreatorPost(post)}
   {author}
   contentLanguage={post.data.lang}
+  {availableLocales}
   title={`${title} | ${tr(config.site.title)}`}
   description={description}
   ogImage={ogImage}
@@ -94,7 +98,7 @@ const ogImage = ogImageUrl ? new URL(ogImageUrl, Astro.site).href : undefined;
     coverImage={getCoverImagePath(coverImage)}
     {canonicalURL}
     contentLanguage={post.data.lang}
-    searchable={isCreatorPost(post)}
+    searchable={isCreatorPost(post) && availableLocales.includes(locale)}
     relatedItems={isCreatorPost(post) ? relatedItems : []}
   >
     <Content />

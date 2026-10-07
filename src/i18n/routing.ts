@@ -28,6 +28,21 @@ export function contentSlug(id: string): string {
   return id.replace(/^(en|zh)\//, "");
 }
 
+/** Entries must already be filtered by the shared publication policy. */
+export function getEntryLocales<
+  T extends { id: string; data: { lang?: string; draft?: boolean } },
+>(entry: T, entries: T[]): Locale[] {
+  const slug = contentSlug(entry.id);
+  return locales.filter(locale =>
+    entries.some(
+      candidate =>
+        !candidate.data.draft &&
+        contentSlug(candidate.id) === slug &&
+        (candidate.data.lang ?? "en") === locale
+    )
+  );
+}
+
 export function selectLocalizedEntries<
   T extends { id: string; data: { lang?: string; draft?: boolean } },
 >(entries: T[], locale: string): T[] {

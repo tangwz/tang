@@ -7,15 +7,17 @@ import EditorialPage from "@/components/EditorialPage.astro";
 import BilibiliPlayer from "@/components/BilibiliPlayer.astro";
 import { getAssetPath } from "@/utils/withBase";
 import { getRelativeLocaleUrl } from "astro:i18n";
-import { contentSlug } from "@/i18n/routing";
+import { contentSlug, resolveLocale } from "@/i18n/routing";
 import config from "@/config";
 import { getLocaleAnchors } from "@/utils/getLocaleAnchors";
+import { getContentLocales } from "@/utils/getLocalizedContent";
 type Props = {
   video: CollectionEntry<"videos">;
   relatedVideos: CollectionEntry<"videos">[];
 };
 const { video, relatedVideos } = Astro.props;
-const locale = Astro.currentLocale ?? config.site.lang;
+const locale = resolveLocale(Astro.currentLocale ?? config.site.lang);
+const availableLocales = await getContentLocales(video);
 const relatedItems = relatedVideos.map(item => ({
   title: item.data.title,
   description: item.data.description,
@@ -38,6 +40,7 @@ const localeAnchors = await getLocaleAnchors(video, headings, locale);
 
 <PostLayout
   contentLanguage={video.data.lang}
+  {availableLocales}
   title={`${title} | ${tr(config.site.title)}`}
   {description}
   ogImage={getAssetPath(image)}
@@ -52,6 +55,7 @@ const localeAnchors = await getLocaleAnchors(video, headings, locale);
     {headings}
     {localeAnchors}
     {relatedItems}
+    searchable={availableLocales.includes(locale)}
   >
     <BilibiliPlayer
       slot="cover"
