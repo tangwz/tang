@@ -14,6 +14,7 @@ const info = JSON.parse(
 );
 const site = new URL(info.site);
 const base = info.base ?? "/";
+const baseRoot = base.replace(/\/+$/, "") + "/";
 const errors = [];
 const decode = value => value.replace(/&amp;/g, "&");
 const exists = async url =>
@@ -101,6 +102,19 @@ for (const [path, html] of htmlByPath) {
 }
 
 const sitemap = await readFile(new URL("sitemap-0.xml", root), "utf8");
+const robots = await readFile(new URL("robots.txt", root), "utf8");
+const advertisedSitemaps = [...robots.matchAll(/^Sitemap:\s*(\S+)/gim)].map(
+  match => match[1]
+);
+const expectedSitemap = new URL(baseRoot + "sitemap-index.xml", site).href;
+if (
+  advertisedSitemaps.length !== 1 ||
+  advertisedSitemaps[0] !== expectedSitemap ||
+  !(await exists(new URL("sitemap-index.xml", root)))
+)
+  errors.push(
+    "robots.txt must advertise the deployed sitemap index: " + expectedSitemap
+  );
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(
   match => new URL(decode(match[1]))
 );
@@ -131,10 +145,30 @@ for (const prefix of ["", "zh/"]) {
       `Missing bilingual route: /${prefix}${page}`
     );
   }
+  for (const [page, enabled] of [
+    ["search/", config.features?.search !== false],
+    ["archives/", config.features?.showArchives !== false],
+  ]) {
+    const html = htmlByPath.get(`/${prefix}${page}`);
+    if (
+      !enabled &&
+      html &&
+      (!noindex(html) || !/<h1\b[^>]*>\s*404\s*<\/h1>/.test(html))
+    )
+      errors.push(`Disabled feature is still exposed: /${prefix}${page}`);
+  }
   const rss = await readFile(new URL(`${prefix}rss.xml`, root), "utf8");
+  const channelLink = rss.match(/<channel>[\s\S]*?<link>(.*?)<\/link>/)?.[1];
+  const expectedHome = new URL(baseRoot + prefix, site).href;
+  if (!channelLink || decode(channelLink) !== expectedHome)
+    errors.push(`Incorrect RSS channel homepage: ${prefix}rss.xml`);
   for (const match of rss.matchAll(/<link>(.*?)<\/link>/g)) {
-    if (new URL(decode(match[1])).origin !== site.origin)
+    const link = new URL(decode(match[1]));
+    const outputPath = getOutputPath(link.pathname, base);
+    if (link.origin !== site.origin)
       errors.push(`Wrong RSS origin: ${prefix}rss.xml`);
+    if (outputPath === undefined || !htmlByPath.has(outputPath))
+      errors.push(`Broken RSS local URL: ${prefix}rss.xml: ${link.href}`);
   }
 }
 assert.ok(

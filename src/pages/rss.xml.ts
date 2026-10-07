@@ -4,6 +4,7 @@ import { getPostUrl } from "@/utils/getPostPaths";
 import { getLocalizedPosts } from "@/utils/getLocalizedContent";
 import { translate } from "@/i18n/creator";
 import config from "@/config";
+import { getRelativeLocaleUrl } from "astro:i18n";
 
 export async function createRss(locale: string) {
   const posts = await getLocalizedPosts(locale);
@@ -12,7 +13,7 @@ export async function createRss(locale: string) {
   return rss({
     title: translate(locale, config.site.title),
     description: translate(locale, config.site.description),
-    site: config.site.url,
+    site: new URL(getRelativeLocaleUrl(locale, ""), config.site.url),
     customData: `<language>${locale === "zh" ? "zh-CN" : "en"}</language>`,
     items: sortedPosts.map(({ data, id, filePath }) => ({
       link: getPostUrl(id, filePath, locale),
