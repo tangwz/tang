@@ -112,98 +112,115 @@ const isWorksPage =
   </div>
 </header>
 
-<script>
-  let menuController: AbortController | undefined;
+<script is:inline>
+  // Initialize before paint without waiting for deferred modules.
+  (() => {
+    let menuController;
 
-  function setupMenu() {
-    menuController?.abort();
-    const header = document.querySelector<HTMLElement>(".portfolio-header");
-    const button = header?.querySelector<HTMLButtonElement>(
-      ".portfolio-menu-toggle"
-    );
-    const menu = header?.querySelector<HTMLElement>("#portfolio-menu");
-    if (!header || !button || !menu) return;
+    function setupMenu() {
+      menuController?.abort();
+      const header = document.querySelector(".portfolio-header");
+      const button = header?.querySelector(".portfolio-menu-toggle");
+      const menu = header?.querySelector("#portfolio-menu");
+      if (!header || !button || !menu) return;
 
-    menuController = new AbortController();
-    const { signal } = menuController;
-    const mobile = window.matchMedia("(max-width: 781px)");
+      menuController = new AbortController();
+      const { signal } = menuController;
+      const mobile = window.matchMedia("(max-width: 781px)");
+      let toggleFocused = document.activeElement === button;
 
-    const setOpen = (open: boolean) => {
-      button.setAttribute("aria-expanded", String(open));
-      button.setAttribute(
-        "aria-label",
-        (open ? button.dataset.closeLabel : button.dataset.openLabel) ??
-          "Toggle menu"
+      button.addEventListener("focus", () => (toggleFocused = true), {
+        signal,
+      });
+      button.addEventListener(
+        "blur",
+        () => {
+          // Desktop CSS can clear focus before the media-query change fires.
+          if (mobile.matches) toggleFocused = false;
+        },
+        { signal }
       );
-      const hidden = mobile.matches && !open;
-      if (hidden && menu.contains(document.activeElement)) {
-        button.focus();
-      }
-      menu.hidden = hidden;
-    };
-    const reset = () => {
-      setOpen(false);
-      if (!mobile.matches && document.activeElement === button) {
-        menu
-          .querySelector<HTMLAnchorElement>(".portfolio-nav a")
-          ?.focus({ preventScroll: true });
-      }
-    };
 
-    button.addEventListener(
-      "click",
-      () => setOpen(button.getAttribute("aria-expanded") !== "true"),
-      { signal }
-    );
-    document.addEventListener(
-      "click",
-      event => {
-        if (!mobile.matches || !(event.target instanceof Node)) return;
-        const link =
-          event.target instanceof Element && menu.contains(event.target)
-            ? event.target.closest<HTMLAnchorElement>("a")
-            : null;
-        if (!header.contains(event.target) || link) {
-          setOpen(false);
-          if (link) {
-            const destination = new URL(link.href);
-            if (
-              destination.hash &&
-              destination.origin === location.origin &&
-              destination.pathname === location.pathname &&
-              destination.search === location.search
-            ) {
-              // Native fragment navigation can reset focus after this handler.
-              requestAnimationFrame(() => {
-                if (!signal.aborted && menu.hidden) {
-                  button.focus({ preventScroll: true });
-                }
-              });
-            }
-          }
-        }
-      },
-      { signal }
-    );
-    document.addEventListener(
-      "keydown",
-      event => {
-        if (
-          event.key === "Escape" &&
-          button.getAttribute("aria-expanded") === "true"
-        ) {
-          setOpen(false);
+      const setOpen = open => {
+        button.setAttribute("aria-expanded", String(open));
+        button.setAttribute(
+          "aria-label",
+          (open ? button.dataset.closeLabel : button.dataset.openLabel) ??
+            "Toggle menu"
+        );
+        const hidden = mobile.matches && !open;
+        if (hidden && menu.contains(document.activeElement)) {
           button.focus();
         }
-      },
-      { signal }
-    );
-    mobile.addEventListener("change", reset, { signal });
-    header.dataset.menuReady = "true";
-    reset();
-  }
+        menu.hidden = hidden;
+      };
+      const reset = () => {
+        setOpen(false);
+        if (!mobile.matches && toggleFocused) {
+          toggleFocused = false;
+          menu
+            .querySelector(".portfolio-nav a")
+            ?.focus({ preventScroll: true });
+        }
+      };
 
-  setupMenu();
-  document.addEventListener("astro:after-swap", setupMenu);
-  document.addEventListener("astro:before-swap", () => menuController?.abort());
+      button.addEventListener(
+        "click",
+        () => setOpen(button.getAttribute("aria-expanded") !== "true"),
+        { signal }
+      );
+      document.addEventListener(
+        "click",
+        event => {
+          if (!mobile.matches || !(event.target instanceof Node)) return;
+          const link =
+            event.target instanceof Element && menu.contains(event.target)
+              ? event.target.closest("a")
+              : null;
+          if (!header.contains(event.target) || link) {
+            setOpen(false);
+            if (link) {
+              const destination = new URL(link.href);
+              if (
+                destination.hash &&
+                destination.origin === location.origin &&
+                destination.pathname === location.pathname &&
+                destination.search === location.search
+              ) {
+                // Native fragment navigation can reset focus after this handler.
+                requestAnimationFrame(() => {
+                  if (!signal.aborted && menu.hidden) {
+                    button.focus({ preventScroll: true });
+                  }
+                });
+              }
+            }
+          }
+        },
+        { signal }
+      );
+      document.addEventListener(
+        "keydown",
+        event => {
+          if (
+            event.key === "Escape" &&
+            button.getAttribute("aria-expanded") === "true"
+          ) {
+            setOpen(false);
+            button.focus();
+          }
+        },
+        { signal }
+      );
+      mobile.addEventListener("change", reset, { signal });
+      header.dataset.menuReady = "true";
+      reset();
+    }
+
+    setupMenu();
+    document.addEventListener("astro:after-swap", setupMenu);
+    document.addEventListener("astro:before-swap", () =>
+      menuController?.abort()
+    );
+  })();
 </script>
