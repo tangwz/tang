@@ -141,7 +141,14 @@ const isWorksPage =
       }
       menu.hidden = hidden;
     };
-    const reset = () => setOpen(false);
+    const reset = () => {
+      setOpen(false);
+      if (!mobile.matches && document.activeElement === button) {
+        menu
+          .querySelector<HTMLAnchorElement>(".portfolio-nav a")
+          ?.focus({ preventScroll: true });
+      }
+    };
 
     button.addEventListener(
       "click",
@@ -197,6 +204,6 @@ const isWorksPage =
   }
 
   setupMenu();
-  document.addEventListener("astro:page-load", setupMenu);
+  document.addEventListener("astro:after-swap", setupMenu);
   document.addEventListener("astro:before-swap", () => menuController?.abort());
 </script>
