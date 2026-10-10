@@ -135,14 +135,13 @@ const isWorksPage =
         (open ? button.dataset.closeLabel : button.dataset.openLabel) ??
           "Toggle menu"
       );
-      menu.hidden = mobile.matches && !open;
-    };
-    const reset = () => {
-      if (mobile.matches && menu.contains(document.activeElement)) {
+      const hidden = mobile.matches && !open;
+      if (hidden && menu.contains(document.activeElement)) {
         button.focus();
       }
-      setOpen(false);
+      menu.hidden = hidden;
     };
+    const reset = () => setOpen(false);
 
     button.addEventListener(
       "click",
@@ -153,13 +152,28 @@ const isWorksPage =
       "click",
       event => {
         if (!mobile.matches || !(event.target instanceof Node)) return;
-        if (
-          !header.contains(event.target) ||
-          (event.target instanceof Element &&
-            menu.contains(event.target) &&
-            event.target.closest("a"))
-        ) {
+        const link =
+          event.target instanceof Element && menu.contains(event.target)
+            ? event.target.closest<HTMLAnchorElement>("a")
+            : null;
+        if (!header.contains(event.target) || link) {
           setOpen(false);
+          if (link) {
+            const destination = new URL(link.href);
+            if (
+              destination.hash &&
+              destination.origin === location.origin &&
+              destination.pathname === location.pathname &&
+              destination.search === location.search
+            ) {
+              // Native fragment navigation can reset focus after this handler.
+              requestAnimationFrame(() => {
+                if (!signal.aborted && menu.hidden) {
+                  button.focus({ preventScroll: true });
+                }
+              });
+            }
+          }
         }
       },
       { signal }
