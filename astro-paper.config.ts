@@ -27,7 +27,40 @@ export default defineAstroPaperConfig({
     },
     search: "pagefind",
   },
-  socials: [],
+  // Demo links use platform homepages; replace them with your own profiles.
+  socials: [
+    {
+      name: "github",
+      url: "https://github.com/",
+      linkTitle: "GitHub (demo)",
+    },
+    { name: "x", url: "https://x.com/", linkTitle: "X (demo)" },
+    {
+      name: "youtube",
+      url: "https://www.youtube.com/",
+      linkTitle: "YouTube (demo)",
+    },
+    {
+      name: "bilibili",
+      url: "https://www.bilibili.com/",
+      linkTitle: "Bilibili (demo)",
+    },
+    {
+      name: "weibo",
+      url: "https://weibo.com/",
+      linkTitle: "Weibo (demo)",
+    },
+    {
+      name: "xiaohongshu",
+      url: "https://www.xiaohongshu.com/",
+      linkTitle: "Xiaohongshu (demo)",
+    },
+    {
+      name: "douyin",
+      url: "https://www.douyin.com/",
+      linkTitle: "Douyin (demo)",
+    },
+  ],
   shareLinks: [
     { name: "x", url: "https://x.com/intent/post?url=" },
     { name: "facebook", url: "https://www.facebook.com/sharer.php?u=" },
