@@ -5,6 +5,7 @@ import { getRelativeLocaleUrl } from "astro:i18n";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Socials from "@/components/Socials.astro";
 import Newsletter from "@/components/Newsletter.astro";
 import CreatorIcon from "@/components/CreatorIcon.astro";
 import { creator } from "@/data/creator";
@@ -31,6 +32,13 @@ const href = (path: string) =>
           )
         }
       </p>
+      {
+        config.socials.length > 0 && (
+          <div class="page-header-socials" data-pagefind-ignore>
+            <Socials />
+          </div>
+        )
+      }
     </div><section class="about-grid">
       <img
         src={creator.images.desk}
