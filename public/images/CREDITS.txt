@@ -1,3 +1,6 @@
+English: CREDITS.txt
+Simplified Chinese: CREDITS.zh-CN.txt
+
 Theme photography from Unsplash:
 
 Creative desk: https://images.unsplash.com/photo-1499750310107-5fef28a66643

@@ -1,14 +1,18 @@
-# 发布说明
+# Release guide
 
-当前域名、托管平台和 Newsletter 服务保持未配置状态。普通预览构建可用；`pnpm build:release` 会拒绝 `example.com`、本地域名和非 HTTPS 地址，避免误将占位 canonical、RSS、分享链接发布为正式站点。
+**English** | [简体中文](RELEASE.zh-CN.md)
 
-## 选定域名后的最短流程
+[README](../README.md) · [User guide](GUIDE.md)
 
-1. 修改 `astro-paper.config.ts` 的 `site.url`，填写真实 HTTPS 域名。
-2. 替换个人资料、照片、示例文章和视频链接。可保留两个公开的 Markdown／配置示例；正式内容取消 `sample` 标记。
-3. 未接入邮件服务时，让 Newsletter 保持关闭。无需为了上线强行打开订阅。
-4. 复核中英文文案、阅读链接与视频素材；提交本次代码，使发布产物对应一个明确的 revision。
-5. 进行发布构建，将完整的 `dist/` 部署到选定的静态托管平台。
+The production domain, hosting provider, and Newsletter service are not configured yet. Regular preview builds work; `pnpm build:release` rejects `example.com`, local domains, and non-HTTPS URLs to prevent placeholder canonical URLs, RSS feeds, and sharing links from being published as a production site.
+
+## After choosing a domain
+
+1. Set `site.url` in `astro-paper.config.ts` to the real HTTPS domain.
+2. Replace the profile, photographs, sample articles, and video links. The two public Markdown and configuration examples may remain; remove the `sample` label from your own finished content.
+3. Keep Newsletter subscriptions disabled until an email provider is connected. Subscriptions are not required to launch the site.
+4. Review both languages, reading links, and video assets. Commit the changes so the release artifact corresponds to a known revision.
+5. Create a release build and deploy the complete `dist/` directory to your static hosting provider.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -19,42 +23,42 @@ pnpm build:release
 pnpm preview
 ```
 
-不要使用开发服务器作为线上服务。托管平台需要保留目录页面、PNG、XML 与 Pagefind 文件；未知地址应返回 `404.html` 和 HTTP 404。不要把所有路径重写到首页。更改域名、公开环境变量或发布时间后，需要重新构建。
+Do not use the development server in production. The hosting provider must serve directory pages, PNGs, XML, and Pagefind files. Unknown URLs should return `404.html` with HTTP status 404; do not rewrite every path to the homepage. Rebuild after changing the domain, public environment variables, or publication times.
 
-## 上线验收
+## Launch verification
 
-| 页面／功能                | 检查内容                                                             |
-| ------------------------- | -------------------------------------------------------------------- |
-| `/` 与 `/zh/`             | 姓名、照片、介绍、字体、导航、深浅色和手机布局                       |
-| `/works/` 与 `/zh/works/` | 搜索入口、分类筛选、分页、刷新、前进／后退                           |
-| Markdown 和配置示例       | 目录、翻译锚点、代码复制、公式深浅色及手机滚动、表格、脚注、图片预览 |
-| 视频详情                  | 真实视频播放、分集参数、外部链接、文字稿；不自动播放                 |
-| 分享和索引                | canonical、hreflang、中英文 OG、RSS、sitemap 均使用真实域名          |
-| 旧主题教程                | 页面可直接访问，但 robots 为 `noindex`，不进入公开列表和 sitemap     |
-| Newsletter／隐私          | 关闭状态不显示邮箱输入框；开启状态的同意、确认、退订和删除请求可用   |
-| 404                       | 不存在的地址返回 404 状态，可回到首页                                |
+| Page or feature                     | What to check                                                                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `/` and `/zh/`                      | Name, photograph, introduction, fonts, navigation, themes, and mobile layout                                                  |
+| `/works/` and `/zh/works/`          | Search entry, category filters, pagination, reloads, and back/forward navigation                                              |
+| Markdown and configuration examples | Table of contents, translated anchors, code copying, math in both themes and on mobile, tables, footnotes, and image previews |
+| Video details                       | Real playback, multipart parameters, external links, and transcripts; no autoplay                                             |
+| Sharing and indexing                | Canonical URLs, hreflang, English/Chinese Open Graph images, RSS, and sitemap use the real domain                             |
+| Legacy theme tutorials              | Direct access works, robots metadata specifies `noindex`, and pages stay out of public lists and the sitemap                  |
+| Newsletter and privacy              | No email field while disabled; consent, confirmation, unsubscribe, and deletion requests work when enabled                    |
+| 404                                 | Unknown URLs return HTTP 404 and provide a way back to the homepage                                                           |
 
-建议在 320px、768px 和桌面宽度下分别检查；键盘操作应能到达导航、搜索、主题切换、筛选、目录和表单。上线后对这几类页面分别做 Lighthouse 或 Web Vitals 检查，不套用上游主题的分数。
+Check layouts at 320px, 768px, and desktop widths. Keyboard navigation should reach the navigation links, search, theme switch, filters, table of contents, and forms. After launch, measure these page types with Lighthouse or Web Vitals; the upstream theme's scores do not represent this site.
 
-## Newsletter 开启前
+## Before enabling Newsletter
 
-四项必需信息见 `.env.example`：公开表单地址、服务商名称、服务商隐私政策、公开联系邮箱。只有全部配置时页面才渲染表单。HTTPS 地址与联系邮箱的格式错误会阻止构建。
+The four required values are listed in `.env.example`: the public form action URL, provider name, provider privacy policy URL, and public contact email. The form renders only when all four are configured. Invalid HTTPS URLs or contact email formats stop the build.
 
-表单提交 `email`、`interest` 和必选的 `consent`；不同邮件服务字段可能不同，需要按实际服务调整。接入时使用自己的测试邮箱，确认以下行为：
+The form submits `email`, `interest`, and required `consent`. Provider fields may differ, so adapt them to the actual service. Use your own test email address to verify that:
 
-- 新订阅进入待确认状态，确认邮件及确认链接可用。
-- 邮箱重复、无效或提交失败时，服务返回清晰结果。
-- Newsletter 含有效退订链接，退订后不再发送。
-- 公开联系邮箱可处理删除请求，隐私说明与实际服务流程一致。
+- A new subscription enters a pending-confirmation state, and the confirmation email and link work.
+- Duplicate addresses, invalid addresses, and submission failures produce clear results.
+- Every Newsletter includes a working unsubscribe link, and unsubscribed addresses receive no further mail.
+- The public contact address can handle deletion requests, and the privacy statement matches the actual workflow.
 
-接入和上述验收完成之前，不要启用正式订阅。所有 `PUBLIC_` 值会出现在浏览器端；邮件服务 API 密钥不属于这些配置。
+Keep production subscriptions disabled until the integration and these checks are complete. All `PUBLIC_` values are visible in the browser; email service API secrets do not belong in these settings.
 
-## 来源和回滚
+## Artifact provenance and rollback
 
-CI 保存 `site-<commit-sha>` 产物；其中的 `build-info.json` 记录构建版本、时间、站点域名、实际部署 base、revision 和 dirty 状态。平台确定后，可以直接部署同一份静态产物；无需现场重新生成。
+CI saves a `site-<commit-sha>` artifact. Its `build-info.json` records the version, build time, site URL, actual deployment base, revision, and dirty state. Once a hosting provider is selected, deploy that same static artifact without rebuilding it during deployment.
 
-如果部署在域名的子路径，设置 `astro.config.ts` 的 `base`。构建校验使用产物中记录的实际 base，将 URL 映射到输出目录；分享图片、sitemap、robots.txt 中的 sitemap 地址和 RSS 链接也采用同一规则。中英文 RSS 的频道链接分别指向对应语言的首页，只收录该语言已发布的文章，不收录未翻译的回退页面。
+For deployment under a domain subpath, set `base` in `astro.config.ts`. Build checks use the actual base recorded in the artifact to map URLs to output paths. Sharing images, the sitemap, its URL in `robots.txt`, and RSS links use the same base. English and Chinese RSS channel links point to their respective homepages and include only published articles in that language, excluding untranslated fallback pages.
 
-保留最近一次正式发布的产物与 revision。回滚时重新部署已验证的上一份完整产物，或使用托管平台已有的部署回滚能力；不要混合两个构建的 HTML 和 Pagefind 索引。CI 产物默认保留 14 天，更长的保存周期由最终托管平台或发布归档管理。
+Keep the last production artifact and its revision. To roll back, redeploy the previous verified artifact in full or use the hosting provider's deployment rollback feature. Do not mix HTML and Pagefind indexes from different builds. CI retains artifacts for 14 days by default; longer retention belongs in the hosting platform or a release archive.
 
-托管平台和域名确定后，才能完成 DNS、HTTPS、缓存规则、自动部署凭据以及线上 404 验收；当前不预设某一平台，也不创建外部部署。
+DNS, HTTPS, caching rules, automatic deployment credentials, and production 404 verification can be completed after the domain and hosting provider are chosen. This repository does not assume a particular provider or create an external deployment.
