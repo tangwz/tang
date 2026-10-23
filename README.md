@@ -106,6 +106,23 @@ PUBLIC_BILIBILI_CHANNEL_URL=
 
 配置地址不等于已完成邮件集成。开启前需在服务商端设置确认邮件、退订链接、成功／失败页面，并实际验收。详见 [发布说明](docs/RELEASE.md)。
 
+## Google Analytics（可选）
+
+默认不加载统计脚本。接入 GA4 时，在 `astro-paper.config.ts` 的 `site` 中填写网站数据流的 Measurement ID，然后重新构建并发布：
+
+```ts
+site: {
+  // Keep the other site settings.
+  googleAnalyticsId: "G-XXXXXXXXXX",
+},
+```
+
+只需要公开的 `G-...` ID，不需要 API Secret。删除或留空即可关闭；非法 ID 会阻止构建。开发模式不加载统计脚本，生产构建及其本地预览会加载。自动化浏览器测试应拦截 Google 请求，避免污染真实统计。
+
+在 GA4 网站数据流的增强型衡量设置中，保留“网页浏览”及“根据浏览器历史记录事件进行的网页更改”。主题只初始化 Google tag 一次，由 Google 记录首次加载和历史记录变化，不额外手动发送 `page_view`。这适用于 Astro 客户端导航，以及作品库筛选、分页和搜索查询产生的 URL 变化；这些 URL 变化会纳入浏览统计。
+
+启用后，中英文隐私页自动显示 Google Analytics 及 Cookie 使用说明。发布后可在 GA4 实时报告中核对访问；如需验证事件与导航对应关系，可使用 DebugView。参考 [Google SPA 衡量文档](https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications)。
+
 ## CI 与发布
 
 CI 在 push、PR 或手动触发时检查格式、lint、单元测试和完整构建。测试覆盖发布时间边界、译文回退、语言 URL 与锚点、主题偏好、Bilibili 地址、中文脚注和公式解析。产物检查覆盖中英文路由、站内链接、分享图片、公式静态渲染、RSS、404 与 sitemap 的索引范围。
