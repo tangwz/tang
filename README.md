@@ -110,6 +110,8 @@ Start with your site settings, profile, and first article:
 
 Public subscription settings are listed in [`.env.example`](.env.example). The form appears only when all required values are present and valid. See [Newsletter integration](docs/RELEASE.md#before-enabling-newsletter) for provider fields, confirmation emails, and unsubscribe flows.
 
+Optional Google Analytics 4 tracking is configured through `site.googleAnalyticsId` in `astro-paper.config.ts`. See the [Google Analytics guide](docs/GUIDE.md#google-analytics) for setup, navigation tracking, and verification.
+
 ## 🧰 Tech stack
 
 | Purpose                   | Technology                              |

@@ -110,6 +110,8 @@ pnpm preview
 
 订阅表单的公开配置见 [`.env.example`](.env.example)。必需信息完整且合法时才显示表单；邮件服务的字段适配、确认邮件与退订流程见 [Newsletter 接入说明](docs/RELEASE.zh-CN.md#newsletter-开启前)。
 
+可通过 `astro-paper.config.ts` 中的 `site.googleAnalyticsId` 启用 Google Analytics 4。配置方式、导航统计和验证步骤见 [Google Analytics 指南](docs/GUIDE.zh-CN.md#google-analytics)。
+
 ## 🧰 技术栈
 
 | 用途           | 技术                                    |

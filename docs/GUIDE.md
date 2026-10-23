@@ -89,3 +89,20 @@ PUBLIC_BILIBILI_CHANNEL_URL=
 The subscription form appears only when the first four values are complete and valid. Otherwise the site shows a closed-subscription notice and links to public letters, without collecting email addresses. The provider must accept a standard POST with an `email` field; adapt any other fields to its requirements. The form requires explicit consent, and the privacy page shows the actual provider, purpose, unsubscribe information, and contact details.
 
 Setting these addresses does not complete the integration. Before enabling subscriptions, configure confirmation emails, unsubscribe links, and success/failure pages with the provider, then verify the full flow. See the [release guide](RELEASE.md).
+
+## Google Analytics
+
+Analytics scripts are disabled by default. To enable GA4, set the web data stream's Measurement ID in `site` in `astro-paper.config.ts`, then rebuild and deploy:
+
+```ts
+site: {
+  // Keep the other site settings.
+  googleAnalyticsId: "G-XXXXXXXXXX",
+},
+```
+
+Only the public `G-...` ID is needed; no API Secret is required. Remove the value or leave it empty to disable tracking. Invalid IDs stop the build. Development mode does not load analytics scripts; production builds and their local previews do. Automated browser tests should block Google requests to avoid recording test traffic.
+
+In the GA4 web stream's enhanced measurement settings, keep page views and page changes based on browser history events enabled. The theme initializes the Google tag once, letting Google record the initial load and history changes without manually sending additional `page_view` events. This covers Astro client navigation and URL changes from portfolio filters, pagination, and search queries; those URL changes count as page views.
+
+When enabled, both privacy pages automatically explain Google Analytics and cookie use. After deployment, check visits in the GA4 Realtime report. Use DebugView to verify that events correspond to navigation. See Google's [single-page application measurement guide](https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications).
